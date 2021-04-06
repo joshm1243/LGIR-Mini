@@ -1,0 +1,519 @@
+<!DOCTYPE html>
+<html>
+<head>
+
+<title>LGIR: Workspace</title>
+
+<!-- Including the blockly application from the static files directory -->
+<!-- <script src="{% static 'application/blockly/google-blockly-edd475f/blockly_compressed.js' %}"></script>
+<script src="{% static 'application/blockly/google-blockly-edd475f/blocks_compressed.js' %}"></script>
+<script src="{% static 'application/blockly/google-blockly-edd475f/javascript_compressed.js' %}"></script>
+<script src="{% static 'application/blockly/google-blockly-edd475f/python_compressed.js' %}"></script>
+<script src="{% static 'application/blockly/google-blockly-edd475f/msg/js/en.js' %}"></script> -->
+
+<link rel="icon" href="../../../static/images/favicon.png" sizes="16x16" type="image/png">
+
+
+<!-- Loading Static CSS -->
+<link rel="stylesheet" href="./../../static/css/generics/main.css" type="text/css">
+<link rel="stylesheet" href="./../../static/css/generics/chat.css" type="text/css">
+<link rel="stylesheet" href="./../../static/css/generics/navigation.css" type="text/css">
+<link rel="stylesheet" href="./../../static/css/generics/workpspace.css" type="text/css">
+
+</head>
+
+<body>
+<!-- Defining the page navigation bars -->
+<ul id="top_nav">
+  <li><a id="site-title">LGIR</a></li>
+  <li><a href="./../../../dashboard/">Dashboard</a></li>
+  <li><a>Account Settings</a></li>
+  <li style="float:right"><a>Logout</a></li>
+</ul>
+
+<ul id="mobile-top-nav">
+  <li><a>&#9776</a></li>
+  <li><a>LGIR</a></li>
+</ul>
+
+<ul id="project_nav">
+  <li><a>{{ appcode }}</a></li>
+  <li><a id="toggle-monitor">Monitor</a></li>
+  <li><a id="request-edit">Edit</a>
+  <li><a id="download-code">Download Code</a></li>
+  <li><a id="toggle-chat">Chat</a></li>
+  <li><a href="../settings/">Project Settings</a></li>
+</ul>
+
+
+<!-- Defining the main container for the page -->
+<div id="main">
+
+  <!-- Holds all items relating to Blockly -->
+  <div id="workspace-area">
+    <div id="blockly-wrapper">
+      <div id="workspace-loading-message">
+        <h1>Loading the workspace</h1>
+      </div>
+
+      <div id="allow-edit-message" style="display: none">
+        <h1>Someone would like to edit the workspace.</h1>
+        <h2>Make them the editor?<h2>
+        <a id='allow-edit'>Yes</a>
+        <a id='block-edit'>No</a>
+        <h3>You'll give automatic permission in 5 seconds</h3>
+      </div>
+
+      <div id="someone-is-editing-message" style="display: none">
+        <h1>Someone is editing the workspace right now.</h1>
+        <h2>Press the edit button to ask for edit permissions.</h2>
+      </div>
+
+      <div id="positive-edit-message" style="display: none">
+        <h1>Congratulations!</h1>
+        <h2>You now have permission to edit the workspace.</h2>
+      </div>
+
+      <div id="negative-edit-message" style="display: none">
+        <h1>Well this is awkward!</h1>
+        <h2>The editor refused your request to edit.</h2>
+      </div>
+
+      <div id="asking-for-edit-message" style="display: none">
+        <h1>You've asked for permission to edit.</h1>
+        <h2>Hang on while we just ask the current editor.</h2>
+      </div>
+
+      <div id="current-editor-message" style="display: none">
+        <h1>What a silly billy!</h1>
+        <h2>You're already the editor.</h2>
+      </div>
+    </div>
+    
+    <div id="blockly-container" style="flex: 1;"></div>
+    <div id="monitor-container" style="flex: 1;"></div>
+  </div>
+
+  <!-- Holds all items relating to chat messages -->
+  <div id="chat-container">
+    <div id="chat-header">{{appcode}} chat</div>
+    <div id="chat-display-container"></div>
+    <div id="chat-input-container"><input id="chat-input" placeholder="Please input your text here"></div>
+  </div>
+</div>
+
+<div id="blocklyDiv" style="position: absolute;"></div>
+
+<script src="{% static 'application/custom_blocks/structs.js' %}"></script>
+<script src="{% static 'application/custom_blocks/logic.js' %}"></script>
+<script src="{% static 'application/custom_workspace/toolbox.js' %}"></script>
+
+
+<xml xmlns="https://developers.google.com/blockly/xml" id="toolbox" style="display: none">
+  <category name="Logic" colour="#5b80a5">
+    <block type="controls_if"></block>
+    <block type="logic_compare">
+      <field name="OP">EQ</field>
+    </block>
+    <block type="logic_operation">
+      <field name="OP">AND</field>
+    </block>
+    <block type="logic_negate"></block>
+    <block type="logic_boolean">
+      <field name="BOOL">TRUE</field>
+    </block>
+    <block type="logic_null"></block>
+    <block type="logic_ternary"></block>
+  </category>
+  <category name="Loops" colour="#5ba55b">
+    <block type="controls_repeat_ext">
+      <value name="TIMES">
+        <shadow type="math_number">
+          <field name="NUM">10</field>
+        </shadow>
+      </value>
+    </block>
+    <block type="controls_whileUntil">
+      <field name="MODE">WHILE</field>
+    </block>
+    <block type="controls_for">
+      <field name="VAR" id="C1UdTdx%TI@+tl_0}A~7">i</field>
+      <value name="FROM">
+        <shadow type="math_number">
+          <field name="NUM">1</field>
+        </shadow>
+      </value>
+      <value name="TO">
+        <shadow type="math_number">
+          <field name="NUM">10</field>
+        </shadow>
+      </value>
+      <value name="BY">
+        <shadow type="math_number">
+          <field name="NUM">1</field>
+        </shadow>
+      </value>
+    </block>
+    <block type="controls_forEach">
+      <field name="VAR" id="[WzoaOtF(Thf:VSpUjP6">j</field>
+    </block>
+    <block type="controls_flow_statements">
+      <field name="FLOW">BREAK</field>
+    </block>
+  </category>
+  <category name="Math" colour="#5b67a5">
+    <block type="math_number">
+      <field name="NUM">0</field>
+    </block>
+    <block type="math_arithmetic">
+      <field name="OP">ADD</field>
+      <value name="A">
+        <shadow type="math_number">
+          <field name="NUM">1</field>
+        </shadow>
+      </value>
+      <value name="B">
+        <shadow type="math_number">
+          <field name="NUM">1</field>
+        </shadow>
+      </value>
+    </block>
+    <block type="math_single">
+      <field name="OP">ROOT</field>
+      <value name="NUM">
+        <shadow type="math_number">
+          <field name="NUM">9</field>
+        </shadow>
+      </value>
+    </block>
+    <block type="math_trig">
+      <field name="OP">SIN</field>
+      <value name="NUM">
+        <shadow type="math_number">
+          <field name="NUM">45</field>
+        </shadow>
+      </value>
+    </block>
+    <block type="math_constant">
+      <field name="CONSTANT">PI</field>
+    </block>
+    <block type="math_number_property">
+      <mutation divisor_input="false"></mutation>
+      <field name="PROPERTY">EVEN</field>
+      <value name="NUMBER_TO_CHECK">
+        <shadow type="math_number">
+          <field name="NUM">0</field>
+        </shadow>
+      </value>
+    </block>
+    <block type="math_round">
+      <field name="OP">ROUND</field>
+      <value name="NUM">
+        <shadow type="math_number">
+          <field name="NUM">3.1</field>
+        </shadow>
+      </value>
+    </block>
+    <block type="math_on_list">
+      <mutation op="SUM"></mutation>
+      <field name="OP">SUM</field>
+    </block>
+    <block type="math_modulo">
+      <value name="DIVIDEND">
+        <shadow type="math_number">
+          <field name="NUM">64</field>
+        </shadow>
+      </value>
+      <value name="DIVISOR">
+        <shadow type="math_number">
+          <field name="NUM">10</field>
+        </shadow>
+      </value>
+    </block>
+    <block type="math_constrain">
+      <value name="VALUE">
+        <shadow type="math_number">
+          <field name="NUM">50</field>
+        </shadow>
+      </value>
+      <value name="LOW">
+        <shadow type="math_number">
+          <field name="NUM">1</field>
+        </shadow>
+      </value>
+      <value name="HIGH">
+        <shadow type="math_number">
+          <field name="NUM">100</field>
+        </shadow>
+      </value>
+    </block>
+    <block type="math_random_int">
+      <value name="FROM">
+        <shadow type="math_number">
+          <field name="NUM">1</field>
+        </shadow>
+      </value>
+      <value name="TO">
+        <shadow type="math_number">
+          <field name="NUM">100</field>
+        </shadow>
+      </value>
+    </block>
+    <block type="math_random_float"></block>
+  </category>
+  <category name="Text" colour="#5ba58c">
+    <block type="text">
+      <field name="TEXT"></field>
+    </block>
+    <block type="text_join">
+      <mutation items="2"></mutation>
+    </block>
+    <block type="text_append">
+      <field name="VAR" id="TH!{Qt#La:!fdN,VR0R4">item</field>
+      <value name="TEXT">
+        <shadow type="text">
+          <field name="TEXT"></field>
+        </shadow>
+      </value>
+    </block>
+    <block type="text_length">
+      <value name="VALUE">
+        <shadow type="text">
+          <field name="TEXT">abc</field>
+        </shadow>
+      </value>
+    </block>
+    <block type="text_isEmpty">
+      <value name="VALUE">
+        <shadow type="text">
+          <field name="TEXT"></field>
+        </shadow>
+      </value>
+    </block>
+    <block type="text_indexOf">
+      <field name="END">FIRST</field>
+      <value name="VALUE">
+        <block type="variables_get">
+          <field name="VAR" id="%{n4);1hQ|`oBz6yxZdL">text</field>
+        </block>
+      </value>
+      <value name="FIND">
+        <shadow type="text">
+          <field name="TEXT">abc</field>
+        </shadow>
+      </value>
+    </block>
+    <block type="text_charAt">
+      <mutation at="true"></mutation>
+      <field name="WHERE">FROM_START</field>
+      <value name="VALUE">
+        <block type="variables_get">
+          <field name="VAR" id="%{n4);1hQ|`oBz6yxZdL">text</field>
+        </block>
+      </value>
+    </block>
+    <block type="text_getSubstring">
+      <mutation at1="true" at2="true"></mutation>
+      <field name="WHERE1">FROM_START</field>
+      <field name="WHERE2">FROM_START</field>
+      <value name="STRING">
+        <block type="variables_get">
+          <field name="VAR" id="%{n4);1hQ|`oBz6yxZdL">text</field>
+        </block>
+      </value>
+    </block>
+    <block type="text_changeCase">
+      <field name="CASE">UPPERCASE</field>
+      <value name="TEXT">
+        <shadow type="text">
+          <field name="TEXT">abc</field>
+        </shadow>
+      </value>
+    </block>
+    <block type="text_trim">
+      <field name="MODE">BOTH</field>
+      <value name="TEXT">
+        <shadow type="text">
+          <field name="TEXT">abc</field>
+        </shadow>
+      </value>
+    </block>
+    <block type="text_print">
+      <value name="TEXT">
+        <shadow type="text">
+          <field name="TEXT">abc</field>
+        </shadow>
+      </value>
+    </block>
+    <block type="text_prompt_ext">
+      <mutation type="TEXT"></mutation>
+      <field name="TYPE">TEXT</field>
+      <value name="TEXT">
+        <shadow type="text">
+          <field name="TEXT">abc</field>
+        </shadow>
+      </value>
+    </block>
+  </category>
+  <category name="Lists" colour="#745ba5">
+    <block type="lists_create_with">
+      <mutation items="0"></mutation>
+    </block>
+    <block type="lists_create_with">
+      <mutation items="3"></mutation>
+    </block>
+    <block type="lists_repeat">
+      <value name="NUM">
+        <shadow type="math_number">
+          <field name="NUM">5</field>
+        </shadow>
+      </value>
+    </block>
+    <block type="lists_length"></block>
+    <block type="lists_isEmpty"></block>
+    <block type="lists_indexOf">
+      <field name="END">FIRST</field>
+      <value name="VALUE">
+        <block type="variables_get">
+          <field name="VAR" id="p1ev~ELe-`sK)/XOH2z%">list</field>
+        </block>
+      </value>
+    </block>
+    <block type="lists_getIndex">
+      <mutation statement="false" at="true"></mutation>
+      <field name="MODE">GET</field>
+      <field name="WHERE">FROM_START</field>
+      <value name="VALUE">
+        <block type="variables_get">
+          <field name="VAR" id="p1ev~ELe-`sK)/XOH2z%">list</field>
+        </block>
+      </value>
+    </block>
+    <block type="lists_setIndex">
+      <mutation at="true"></mutation>
+      <field name="MODE">SET</field>
+      <field name="WHERE">FROM_START</field>
+      <value name="LIST">
+        <block type="variables_get">
+          <field name="VAR" id="p1ev~ELe-`sK)/XOH2z%">list</field>
+        </block>
+      </value>
+    </block>
+    <block type="lists_getSublist">
+      <mutation at1="true" at2="true"></mutation>
+      <field name="WHERE1">FROM_START</field>
+      <field name="WHERE2">FROM_START</field>
+      <value name="LIST">
+        <block type="variables_get">
+          <field name="VAR" id="p1ev~ELe-`sK)/XOH2z%">list</field>
+        </block>
+      </value>
+    </block>
+    <block type="lists_split">
+      <mutation mode="SPLIT"></mutation>
+      <field name="MODE">SPLIT</field>
+      <value name="DELIM">
+        <shadow type="text">
+          <field name="TEXT">,</field>
+        </shadow>
+      </value>
+    </block>
+    <block type="lists_sort">
+      <field name="TYPE">NUMERIC</field>
+      <field name="DIRECTION">1</field>
+    </block>
+  </category>
+  <sep></sep>
+  <category name="Robotics Input" colour="#5b80a5">
+    <block type="add"></block>
+    <block type="input_component"></block>
+    <block type="value_of"></block>
+  </category>
+  <category name="Robotics Output" colour="#745ba5">
+    <block type="output_component"></block>
+    <block type="pin_component"></block>
+    <block type="set"></block>
+    <block type="speed"></block>
+    <block type="wait"></block>
+    <block type="ON_or_OFF"></block>
+    <block type="Brightness"></block>
+  </category>
+  <sep></sep>
+  <category name="Functions" colour="#995ba5" custom="PROCEDURE"></category>
+  <category name="Variables" colour="#a55b80" custom="VARIABLE"></category>
+</xml>
+
+<script>  
+  var wsKey = '{{ websocket_key }}'
+</script>
+
+<!-- Getting the project data from the views args -->
+<script>
+  var blocklyXMLString = '{{ workspace_data }}';
+</script>
+
+
+<!-- Defining resize functions -->
+<script src="{% static 'application/workspace/resize.js' %}"></script>
+
+<!-- Injecting Blockly-->
+<script src="{% static 'application/workspace/blockly_inject.js' %}"></script>
+
+
+<!-- Chat -->
+<script src="{% static 'application/workspace/chat.js' %}"></script>
+
+<!-- Websockets -->
+<script src="{% static 'application/workspace/socket.js' %}"></script>
+
+<script>
+/*
+//Waiting for the download code button to be clicked
+document.getElementById("download-code").addEventListener("click",function(){
+Blockly.JavaScript.INFINITE_LOOP_TRAP = null;
+<script>
+  //   //Waiting for the download code button to be clicked
+  //   document.getElementById("download-code").addEventListener("click",function(){
+  //   Blockly.JavaScript.INFINITE_LOOP_TRAP = null;
+    //Append the virtual button to the main tag
+    var main = document.getElementById("main")
+    document.body.appendChild(virDownloadButton)
+    virDownloadButton.click()
+    document.body.removeChild(virDownloadButton)
+    
+  })
+  */
+  //   //Append the virtual button to the main tag
+  //   var main = document.getElementById("main")
+  //   document.body.appendChild(virDownloadButton)
+  //   virDownloadButton.click()
+  //   document.body.removeChild(virDownloadButton)
+  // })
+  
+</script>
+
+<!-- <script>
+  // Definition Block
+var pin = 0;
+var pos = 1;
+Blockly.Blocks['Pin_Value'] = {
+  innit: function() {
+    this.appendValueInput('VALUE')
+        .setCheck('Number')
+        .appendField('value is ');
+    this.setOutput(true, 'PIN: ', pin, 'AT', pos);
+    this.setColour(160);
+    this.setPreviousStatement(true); 
+    this.setNextStatement(true); 
+  }
+};
+// Block input types - value, statement or dummy.
+  // Generator Stub
+Blockly.Javascript['Pin_Value'] = function(block){
+  var code = '...;\n';
+  return code;
+}
+</script> -->
+
+</body>
+</html>

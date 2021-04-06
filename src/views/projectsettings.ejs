@@ -1,0 +1,1061 @@
+<!DOCTYPE html>
+<html>
+<head>
+
+<title>LGIR: Settings</title>
+
+<!-- Including the blockly application from the static files directory -->
+
+
+
+<script src="../../../static/application/generics/random.js"></script>
+
+
+<link rel="icon" href="../../../static/images/favicon.png" sizes="16x16" type="image/png">
+
+
+<!-- Loading Static CSS -->
+<link rel="stylesheet" href="../../../static/css/generics/main.css" type="text/css">
+<script src="/socket.io/socket.io.js"></script>
+
+
+<style>
+/*
+.content-container {
+  display: flex;
+  flex-wrap: wrap;
+}
+
+.content-container-item {
+  flex: 50%;
+  max-width: 50%;
+  background-color: #666666;
+}
+
+.content-container h1 {
+  color: #FFFFFF;
+  margin-left: 10px;
+  font-size: 1.2em;
+}
+
+@media screen and (max-width: 600px) {
+  .content-container-item {
+    flex: 100%;
+    max-width: 100%;
+  }
+}
+
+.mapping-grid {
+  display: grid;
+  grid-template-columns: auto auto auto;
+  margin-left: 10px;
+}
+
+.mapping-grid-item {
+  border-style: solid;
+  border-color: black;
+  background-color: #666666;
+  font-size: 1.15em;
+  color: #FFFFFF;
+}
+
+.mapping-grid-item input {
+  background-color: #BBBBBB;
+  font-size: 1em;
+  border: none; 
+  max-width: 25px;
+}
+
+.user-grid{
+  width: 100%;
+  display: grid;
+  grid-template-columns: auto auto auto;
+}
+
+.remove-button{
+  cursor: pointer;
+  text-align: center;
+  color: crimson;
+  background-color: #FFFFFF;
+}
+
+*/
+
+#content-container {
+  display: flex;
+  flex-direction: row;
+}
+
+#content-container h1 {
+  margin: 0px;
+  margin-bottom: 10px;
+  text-align: center;
+}
+
+#content-container > div {
+  flex: 50%;
+  padding: 10px;
+}
+
+#project-code-heading {
+  letter-spacing: 10px;
+  text-align: center;
+  font-size: 1.5em;
+  text-transform: uppercase;
+  margin: 0px;
+  margin-top: 30px;
+  color: #FFFFFF;
+}
+
+#project-code {
+  letter-spacing: 10px;
+  text-align: center;
+  font-size: 4em;
+  text-transform: uppercase;
+  margin: 0px;
+  color: #FFFFFF;
+}
+
+@media screen and (max-width: 600px) {
+  #content-container {
+    flex-direction: column;
+  }
+}
+
+#mapping-list {
+  display: flex;
+  flex-direction: column;
+}
+
+#mapping-list > div {
+
+  display: grid;
+  
+  grid-template-areas:
+  "mapping__colour mapping__colour mapping__colour"
+  "mapping__virtual mapping__physical mapping__remove";
+
+  background-color: #313131;
+  color: #FFFFFF;
+  margin-bottom: 20px;
+  box-shadow: 7px 7px 11px #000000;
+  font-size: 1.1em;
+  grid-template-columns: auto auto auto;
+  min-height: 150px;
+}
+
+#settings-container {
+  display: flex;
+  flex-direction: row;
+  margin-bottom: 50px;
+  box-shadow:  0px 0px 15px 2px#000000;
+}
+
+#settings-container input {
+  background-color: #222222;
+  border: none;
+  color: #FFFFFF;
+  width: 250px;
+  text-align: center;
+  font-size: 1.2em;
+  font-family: 'Biryani', sans-serif;
+}
+
+#settings-container #general-settings {
+  flex: 50%;
+  display: grid;
+  grid-template-areas: 
+  "project__name project__name__input"
+  "project__description project__description__input"
+  "project__remove project__remove__button";
+  background-color: #313131;
+  color: #FFFFFF;
+
+  grid-template-rows: 70px auto auto;
+}
+
+#general-settings .project-name {
+  font-size: 1em;
+  grid-area: project__name;
+  margin-right: 10px;
+  padding-top: 28px;
+  text-align: right;
+}
+
+
+#general-settings .project-name-input {
+  padding-top: 20px;
+  grid-area: project__name__input
+}
+
+#general-settings .project-description {
+  font-size: 1em;
+  grid-area: project__description;
+  margin-right: 10px;
+  padding-top: 7px;
+  text-align: right;
+}
+
+#general-settings .project-description-input {
+  grid-area: project__description__input
+}
+
+#general-settings .project-remove {
+  font-size: 1em;
+  grid-area: project__remove;
+  transition: 0.5s;
+  margin-right: 10px;
+  padding-top: 8px;
+  text-align: right;
+}
+
+#general-settings .project-remove-button {
+  background-color: #222222;
+  height: 25px;
+  width: 80px;
+  text-align: center;
+  padding: 8px;
+  cursor: pointer;
+  transition: 0.5s;
+  grid-area: project__remove__button
+}
+
+
+#general-settings .project-remove-button:hover {
+  background-color: var(--red);
+}
+
+#general-settings .project-space {
+  grid-area: project__space
+}
+
+#settings-container #code-settings {
+  flex: 50%;
+  background-color: #313131;
+}
+
+#user-list {
+  display: flex;
+  flex-direction: column;
+}
+
+#user-list > div {
+  padding: 8px;
+  display: flex;
+  flex-direction: row;
+  background-color: #313131;
+  color: #FFFFFF;
+  margin-bottom: 15px;
+  box-shadow: 7px 7px 10px #000000;
+  font-size: 1.1em;
+}
+
+#mapping-list .colour {
+  height: 5px;
+  grid-area: mapping__colour;
+}
+
+#mapping-list .virtual-component {
+  grid-area: mapping__virtual;
+}
+
+#mapping-list .virtual-component {
+  display: grid;
+  grid-template-rows: 25px 50px 10px 50px auto;
+  margin-left: 10px;
+}
+
+#mapping-list .virtual-component input {
+  border: none;
+  background-color: #272727;
+  color: #FFFFFF;
+  font-family: 'Biryani', sans-serif;
+  font-size: 1em;
+}
+
+#mapping-list .virtual-component input::placeholder {
+  color: #DEDEDE;
+  text-align: center;
+}
+
+#mapping-list .virtual-component select {
+  font-family: 'Biryani', sans-serif;
+  color: #FFFFFF;
+  background-color: #242424;
+  border: none;
+  outline: none;
+  cursor: pointer;
+  font-size: 1em;
+}
+
+#mapping-list .physical-component {
+  grid-area: mapping__physical;
+}
+
+#mapping-list .physical-component .text {
+  margin-bottom: 5px;
+  margin-top: 5px;
+}
+
+
+
+#mapping-list .physical-component > div {
+  display: grid;
+  grid-template-columns: auto 90px;
+  text-align: center;
+  margin-top: 25px;
+
+}
+
+#mapping-list .physical-component .text {
+  text-align: right;
+}
+
+#mapping-list .physical-component > div input {
+  font-family: 'Biryani', sans-serif;
+  text-align: center;
+  width: 40px;
+  font-size: 1em;
+  background-color: #272727;
+  color: #FFFFFF;
+  border: none;
+  letter-spacing: 3px;
+  
+}
+
+#mapping-list .remove {
+  margin-right: 10px;
+}
+
+#mapping-list #components-empty-heading {
+  margin: 0px;
+  margin-top: 50px;
+  text-align: center;
+  font-weight: 600;
+  user-select: none;
+  display: none;
+
+}
+
+#mapping-list #components-empty-subheading {
+  margin: 0px;
+  margin-top: 30px;
+  text-align: center;
+  font-size: 1.4em;
+  font-weight: 400;
+  user-select: none;
+  display: none;
+}
+
+#mapping-list .remove-button {
+  margin-top: 25px;
+  text-align: center;
+  cursor: pointer;
+  background-color: #212121;
+  padding: 8px 10px;
+  transition: 0.5s;
+}
+
+#mapping-list .remove-button:hover {
+  background-color: var(--red);
+  transition: 0.5s;
+}
+
+
+
+#user-list .colour {
+  width: 5px;
+  margin-right: 10px;
+}
+
+#user-list .username {
+  flex: auto;
+  margin-left: 10px;
+}
+
+#user-list .role {
+  flex: auto;
+}
+
+#user-list .role select {
+  font-family: 'Biryani', sans-serif;
+  color: #FFFFFF;
+  background-color: #313131;
+  border: none;
+  outline: none;
+  font-size: 1em;
+}
+
+
+#user-list .remove {
+  flex: auto;
+  cursor: pointer;
+}
+
+
+
+#progress-bar {
+  height: 10px;
+}
+
+#progress-bar div {
+  height: 100%;
+  position: relative;
+  overflow: hidden;
+  display: none;
+}
+
+@keyframes move {
+  0% {
+      background-position: 0px;
+  }
+  100% {
+      background-position: 2000px;
+  }
+}
+
+#progress-image:after {
+  height: 10px;
+  position: absolute;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  right: 0;
+  z-index: 5;
+  animation: move 3s linear infinite;
+  content: "";
+  background-size: 2000px;
+  background-image:
+  linear-gradient(to right,
+      var(--teal) 0 400px,
+      var(--grey) 0 500px,
+      var(--pink) 0 900px,
+      var(--grey) 0 1000px,
+      var(--teal) 0 1400px,
+      var(--grey) 0 1500px,
+      var(--pink) 0 1900px,
+      var(--grey) 0 2000px
+  );
+}
+
+#settings-title {
+  text-align: center;
+  font-size: 1.4em;
+}
+
+
+
+
+
+#review-button {
+    background-color: #008674;
+}
+
+#review-button:hover {
+    background-color: #00685a;
+}
+
+#review-area {
+    display: none;
+    color: #FFFFFF;
+    position: fixed;
+    top: 58px;
+    left: 0px;
+    bottom: 0px;
+    right: 0px;
+    background-color: #000000ec;
+    text-align: center;
+}
+
+#review-area #question-grid {
+    display: grid;
+    grid-template-columns: auto auto auto;
+}
+
+
+#review-area h2 {
+    font-weight: 400;
+    margin-bottom: 30px;
+}
+
+#review-area p:nth-of-type(1) {
+    font-size: 1.1em;
+}
+
+#review-area p:nth-of-type(2) {
+    margin-top: 5px;
+    font-size: 1.4em;
+    margin-bottom: 20px;
+}
+
+
+.slider-container .slider {
+  -webkit-appearance: none; 
+  width: 400px;
+  height: 25px;
+  background: #2b2b2b;
+}
+
+
+.slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 60px;
+  height: 25px; 
+  background-color: var(--orange);
+  cursor: pointer;
+}
+
+#review-area-additional {
+  margin-top: 50px;
+  background-color: #2b2b2b;
+  outline: none;
+  border: none;
+  height: 45px;
+  color: #FFFFFF;
+  font-size: 1.2em;
+  padding: 0px 10px;
+}
+
+#review-area a {
+  background-color: #00AAAA;
+  padding: 9px;
+  padding-bottom: 8px;
+  cursor: pointer;
+}
+
+#review-area a:hover {
+  background-color: #006969;
+}
+
+
+#review-area-additional::placeholder {
+    text-align: center;
+}
+
+</style>
+
+</head>
+
+<body>
+
+
+
+<!-- <ul id="mobile-top-nav">
+  <li><a>&#9776</a></li>
+  <li><a>LGIR</a></li>
+</ul> -->
+
+<ul id="top_nav">
+  <li><a>LGIR</a></li>
+  <li><a href="../../../dashboard">Dashboard</a></li>
+  <li><a>Account Settings</a></li>
+  <li class="project-specific"><a id="create-component-button">Create Component</a></li>
+  <li><a id="review-button">Leave Feedback</a></li>
+  <li style="float:right"><a href="./../../../../logout">Logout <%= username %></a></li>
+</ul>
+
+
+<div id="progress-bar">
+  <div id="progress-image"></div>
+</div>
+
+
+<div id="main">
+
+  <div id="review-area">
+
+    <h1 id="review-area-title">Project Settings Page Feedback</h1>
+    <h2>On a scale of 0 to 10, how would you rate the page on the following topics?</h2>
+    <div id="question-grid">
+        <div class="text" id="q1text"></div>
+        <div class="slider-container">
+            <p>Question 1</p>
+            <input type="range" min="0" max="10" value="5" class="slider" id="q1slider">
+            <p id="q1output">5</p>
+        </div>
+        <div></div>
+
+        <div class="text" id="q2text"></div>
+        <div class="slider-container">
+            <p>Question 2</p>
+            <input type="range" min="0" max="10" value="5" class="slider" id="q2slider">
+            <p id="q2output">5</p>
+        </div>
+        <div></div>
+
+        <div class="text" id="q3text"></div>
+        <div class="slider-container">
+            <p>Question 3</p>
+            <input type="range" min="0" max="10" value="5" class="slider" id="q3slider">
+            <p id="q3output">5</p>
+        </div>
+        <div></div>
+    </div>
+    <input placeholder="Extra Text Feedback" id="review-area-additional">
+    <a id="feedback-send-button">Send Feedback</a>
+
+  </div>
+
+  <div id="settings-title">
+    <h1>Project Settings</h1>
+  </div>
+
+  <div id="settings-container">
+
+    <div id="general-settings">
+
+      <div class="project-name">Project Name</div>
+      <div class="project-name-input"><input id="project-name-input" value="<%=name%>" ></div>
+      <div class="project-description">Description</div>
+      <div class="project-description-input"><input id="project-description-input" value="<%=description%>"></div>
+      <div class="project-remove">Delete Project</div>
+      <div class="project-remove-button"><div id="delete-project-button">Delete</div></div>
+      <div class="space"></div>
+
+
+
+    </div>
+
+    <div id="code-settings">
+      
+      <h2 id="project-code-heading">Project Code</h2>
+      <h3 id="project-code"><%= code %></h3>
+      
+
+    </div>
+
+  </div>
+
+ 
+
+  <div id="content-container">
+    <div id="mapping-list"> 
+      <h1>Workspace Components</h1>
+
+          <h2 id="components-empty-heading">{{ appcode }} doesn't currently have any components</h2>
+          <h3 id="components-empty-subheading">Use the Create Component button to begin</h3>
+
+    </div>
+    <div id="user-list">
+      <h1>Project Users</h1>
+
+    </div>
+  </div>
+</div>
+
+<!-- Defining the main container for the page -->
+<!-- <div id="main">
+  <div class="content-container">
+    <div class="content-container-item">
+      <h1>Component Mappings</h1>
+      <button id="new-row">Create New Row</button>
+      <div class="mapping-grid" id="component-grid">
+        <div class="mapping-grid-item ">Virtual Component</div>
+        <div class="mapping-grid-item">Physical Component</div>  
+        <div class="mapping-grid-item">Remove</div>
+      </div>
+    </div>
+    <div class="content-container-item">
+      <h1>Project Users</h1>
+      <div class="user-grid" id="user-grid">    
+        <div class ="mapping-grid-item">Username</div>
+        <div class="mapping-grid-item">Role</div>
+        <div class="mapping-grid-item">Remove</div>
+      </div>
+    </div>
+  </div>
+</div> -->
+
+<script>
+
+  var socket = io()
+  
+  var token =  "<%= token %>"
+  var code = "<%= code %>"
+  var name = "<%= name %>"
+  var description = "<%= description %>"
+
+
+  var reviewArea = document.getElementById("review-area")
+  var reviewButton = document.getElementById("review-button");
+  var reviewAreaStatus = false
+
+  var feedbackSendButton = document.getElementById("feedback-send-button")
+
+
+  reviewButton.addEventListener("click", function(){
+      
+      if (reviewAreaStatus) {
+          reviewAreaStatus = false
+          reviewButton.textContent = "Leave Feedback"
+          reviewArea.style.display = "none"
+      }
+      else {
+          reviewAreaStatus = true
+          reviewButton.textContent = "Close Feedback"
+          reviewArea.style.display = "block"
+      }
+  })
+
+
+  var q1slider = document.getElementById("q1slider")
+  var q2slider = document.getElementById("q2slider")
+  var q3slider = document.getElementById("q3slider")
+
+  var q1Output = document.getElementById("q1output")
+  var q2Output = document.getElementById("q2output")
+  var q3Output = document.getElementById("q3output")
+  
+  var additionalFeedback = document.getElementById("review-area-additional")
+
+  q1slider.addEventListener("input",function(e){
+      q1Output.textContent = e.target.value
+  })
+
+  q2slider.addEventListener("input",function(e){
+      q2Output.textContent = e.target.value
+  })
+  
+  q3slider.addEventListener("input",function(e){
+      q3Output.textContent = e.target.value
+  })
+
+    
+  feedbackSendButton.addEventListener("click",function(){
+
+      socket.emit({
+          "page" : "project-settings",
+          "question1" : q1slider.value,
+          "question2" : q2slider.value,
+          "question3" : q3slider.value,
+          "question4" : additionalFeedback
+      })
+
+      reviewArea.innerHTML = "<h1>Thanks!</h1><h2>Your feedback has been submitted.</h2>"
+
+
+      setTimeout(function(){
+          reviewArea.style.display = "none"
+          reviewButton.style.display = "none"
+      },2500)
+
+  })
+
+
+
+  var projectNameInput = document.getElementById("project-name-input")
+  var projectDescriptionInput = document.getElementById("project-description-input")
+  var projectDeleteButton = document.getElementById("delete-project-button")
+
+
+  projectNameInput.addEventListener("input",function(e){
+    socket.emit("project_name",{
+      "token" : token,
+      "code" : code,
+      "name" : e.target.value
+    })
+  })
+
+  projectDescriptionInput.addEventListener("input",function(e){
+    socket.emit("project_description",{
+      "token" : token,
+      "code" : code,
+      "description" : e.target.value
+    })
+  })
+
+  projectDeleteButton.addEventListener("click", function() {
+    socket.emit("project_delete",{
+      "token" : token,
+      "code" : code
+    })
+  })
+
+  const componentJSON = {
+
+    "Light Emitting Diode (LED)" : {
+      "name" : "Led",
+      "pins" : 1
+    },
+
+    "Pin" : {
+      "name" : "Pin",
+      "pins" : 1
+    },
+
+    "LCD Screen" : {
+      "name" : "screen",
+      "pins" : 15
+    },
+
+    "Buzzer" : {
+      "name" : "Buzzer",
+      "pins" : 1
+    },
+
+    "Joystick" : {
+      "name" : "Joystick",
+      "pins" : 1
+    },
+
+    "Laser" : {
+      "name" : "Laser",
+      "pins" : 1
+    },
+
+    "Motor" : {
+      "name" : "Motor",
+      "pins" : 1
+    },
+
+    "Potentiometer" : {
+      "name" : "Potentiometer",
+      "pins" : 1
+    },
+
+    "Relay" : {
+      "name" : "Relay",
+      "pins" : 1
+    },
+  }
+ 
+  var userList = document.getElementById("user-list")
+  var mappingList = document.getElementById("mapping-list")
+
+  function CreateUserRow(user) {
+
+    let userRow = document.createElement("div")
+
+    let userRowColour = document.createElement("div")
+    userRowColour.classList.add(GetRandomColour(),"colour")
+    userRow.appendChild(userRowColour)
+
+    let userRowUsername = document.createElement("div")
+    userRowUsername.classList.add("username")
+    userRowUsername.textContent = user.username
+    userRow.appendChild(userRowUsername)
+
+    let userRowRole = document.createElement("div")
+    let userRowRoleSelect = document.createElement("select")
+    let userRowRoleOptionOwner = document.createElement("option")
+    userRowRoleOptionOwner.textContent = "Owner"
+    userRowRoleSelect.appendChild(userRowRoleOptionOwner)
+    let userRowRoleOptionCollab = document.createElement("option")
+    userRowRoleOptionCollab.textContent = user.type
+    userRowRoleOptionCollab.selected = "true"
+    userRowRoleSelect.appendChild(userRowRoleOptionCollab)
+    userRowRole.appendChild(userRowRoleSelect)
+    userRowRole.classList.add("role")
+    userRow.appendChild(userRowRole)
+
+    let userRowRemove = document.createElement("div")
+    userRowRemove.classList.add("remove")
+    userRowRemove.textContent = "remove"
+    userRowRemove.addEventListener("click", function(){
+      userRow.remove()
+      socket.emit("project_deleteuser",{
+        "token" : token,
+        "code" : code,
+        "userToRemove" : user.username
+      })
+    })
+    userRow.appendChild(userRowRemove)
+    
+    userList.appendChild(userRow)
+
+  }
+
+
+
+  <% users.forEach(function(user){ %>
+
+    CreateUserRow({
+      "username" : "<%= user.username %>",
+      "type" : "<%= user.type %>"
+    })
+
+  <% }) %>
+
+
+
+
+
+
+  function GeneratePinMappingJSON(name,type,pins) {
+    let pinMappingJSON = {
+      "components" : {
+        [name] : {
+          "type" : type,
+          "pins" : pins
+        }
+      }
+    }
+
+    return pinMappingJSON
+  }
+
+  function InjectPinMapTemplate(div,pins) {
+
+
+    for (let i = 0; i < pins; i++) {
+
+      let mapTemplateText = document.createElement("div")
+      mapTemplateText.classList.add("text")
+
+      if (pins == 1) {
+        mapTemplateText.textContent = "Is connected to pin"
+      }
+      else {
+        mapTemplateText.textContent = "Pin " + (i + 1) + " is connected to pin "
+      }
+
+      div.appendChild(mapTemplateText)
+  
+      //LEFT INPUT
+      let mapTemplateInput = document.createElement("div")
+      mapTemplateInput.classList.add("input")
+      mapTemplateInputBox = document.createElement("input")
+      mapTemplateInput.appendChild(mapTemplateInputBox)
+      div.appendChild(mapTemplateInput)
+    }
+  }
+
+
+
+  function CreateComponentRow(component) {
+
+    
+
+    let componentRow = document.createElement("div")
+
+
+    let componentRowColour = document.createElement("div")
+
+    componentRowColour.classList.add(GetRandomColour(["teal","pink"]),"colour")
+
+
+    componentRow.appendChild(componentRowColour)
+
+
+    let componentRowVirtual = document.createElement("div")
+
+    componentRowVirtual.classList.add("virtual-component")
+
+    componentRowVirtual.appendChild(document.createElement("div"))
+
+
+    
+    let componentRowPhysicalSelect = document.createElement("select")
+
+
+    for (let option in componentJSON) {
+    
+
+      let componentOption = document.createElement("option")
+      componentOption.textContent = option
+
+      if (option == "Light Emitting Diode (LED)") {
+        componentOption.selected = "true"
+      }
+
+      componentRowPhysicalSelect.appendChild(componentOption)
+    }
+
+
+    componentRowPhysicalSelect.addEventListener("change",function(e){
+      
+
+      if (e.target.value in componentJSON) {
+        
+        componentRowPhysicalGrid.innerHTML = ""
+        InjectPinMapTemplate(componentRowPhysicalGrid,componentJSON[e.target.value].pins)
+      }
+
+    })
+
+    //OPTIONS END
+
+    componentRowVirtual.appendChild(componentRowPhysicalSelect)
+
+
+
+    componentRowVirtual.appendChild(document.createElement("div"))
+
+
+    let componentRowVirtualInput = document.createElement("input")
+
+    componentRowVirtualInput.placeholder = "Component Name"
+
+    componentRowVirtualInput.addEventListener("blur",function(e){
+      
+      let pinMap = {}
+
+      for (let i = 1; i < componentJSON[componentRowPhysicalSelect.value].pins * 2; i+=2) {
+        pinMap[(i+1)/2] = componentRowPhysical.childNodes[0].childNodes[i].childNodes[0].value
+      }
+
+      let pinMappingJSON = GeneratePinMappingJSON(e.target.value,componentRowPhysicalSelect.value,pinMap)
+
+      console.log(pinMappingJSON)
+
+    })
+
+    componentRowVirtual.appendChild(componentRowVirtualInput)
+    
+    componentRowVirtual.appendChild(document.createElement("div"))
+
+    componentRow.appendChild(componentRowVirtual)
+
+
+    let componentRowPhysical = document.createElement("div")
+    
+    componentRowPhysical.classList.add("physical-component")
+
+    let componentRowPhysicalGrid = document.createElement("div")
+
+    InjectPinMapTemplate(componentRowPhysicalGrid,1)
+
+    componentRowPhysical.appendChild(componentRowPhysicalGrid)
+
+    componentRow.appendChild(componentRowPhysical)
+
+
+    let componentRowRemove = document.createElement("div")
+
+
+    componentRowRemove.classList.add("remove")
+
+    componentRowRemoveButton = document.createElement("div")
+    componentRowRemoveButton.classList.add("remove-button")
+    componentRowRemoveButton.textContent = "Delete"
+    componentRowRemoveButton.addEventListener("click",function(){
+      componentRow.remove()
+    })
+    componentRowRemove.appendChild(componentRowRemoveButton)
+
+    componentRow.appendChild(componentRowRemove)
+
+    mappingList.appendChild(componentRow)
+
+  }
+
+
+  CreateComponentRow({})
+  CreateComponentRow({})
+  CreateComponentRow({})
+  CreateComponentRow({})
+  CreateComponentRow({})
+  CreateComponentRow({})
+  CreateComponentRow({})
+  CreateComponentRow({})
+  CreateComponentRow({})
+  CreateComponentRow({})
+  CreateComponentRow({})
+
+
+
+  
+</script>
+</body>
+</html>

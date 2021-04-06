@@ -1,0 +1,153 @@
+/* Defining standard LGIR colours */
+:root {
+    --grey: #555555;
+    --dark-grey: #444444;
+    --darker-grey: #313131;
+    --blue: #005DC7;
+    --teal: #00B199;
+    --green: #00FF0094;
+    --red: #FF002B;
+    --orange: #FF9100;
+    --pink: #FF00D4;
+}
+
+
+input {
+    font-family: 'Biryani', sans-serif;
+}
+
+.grey {
+    background-color: var(--grey)
+}
+
+.dark-grey {
+    background-color: var(--dark-grey)
+}
+
+.darker-grey {
+    background-color: var(--darker-grey)
+}
+
+.blue {
+    background-color: var(--blue)
+}
+
+.teal {
+    background-color: var(--teal)
+}
+
+.green {
+    background-color: var(--green)
+}
+
+.red {
+    background-color: var(--red)
+}
+
+.orange {
+    background-color: var(--orange)
+}
+
+.pink {
+    background-color: var(--pink)
+}
+
+body {
+    margin: 0px;
+    font-family: 'Biryani', sans-serif;
+}
+  
+#top_nav {
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+    background-color: #555555;
+}
+
+#top_nav li {
+    float: left;
+}
+
+#top_nav li:hover {
+    background-color: #222222;
+}
+
+#top_nav li a {
+    text-decoration: none;
+    color: #FFFFFF;
+    text-align: center;
+    padding: 15px;
+    display: block;
+    cursor: pointer;
+}
+
+#top_nav .sep {
+    padding-left: 2px;
+    padding-bottom: 58px;
+}
+
+#top_nav .input:hover {
+    background-color: #555555;
+}
+
+#top_nav input {
+    text-align: center;
+    border: none;
+    height: 56px;
+    font-family: 'Biryani', sans-serif;
+    font-size: 1.0em;
+    background-color: #333333;
+    color: #FFFFFF;
+}
+
+#top_nav input.bounding-sides__orange {
+    border-left: 3px solid rgb(255, 123, 0);
+    border-right: 3px solid rgb(255,123,0);
+    color: rgb(255, 123, 0);
+    transition: 0.5s;
+}
+
+#top_nav input.bounding-sides__teal {
+    border-left: 3px solid rgb(0, 255, 128);
+    border-right: 3px solid rgb(0,255,128);
+    color: rgb(0,255,128);
+    transition: 0.5s;
+}
+
+.block-text {
+    letter-spacing: 10px;
+    text-transform: uppercase;
+}
+
+
+
+#mobile-top-nav {
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+    background-color: #555555;
+}
+
+#mobile-top-nav li {
+    float: left;
+}
+
+#mobile-top-nav li a {
+    text-decoration: none;
+    color: #FFFFFF;
+    text-align: center;
+    padding: 15px;
+    display: block;
+    cursor: pointer;
+}
+
+input:focus{
+    outline: none;
+}
+
+
+.project-specific {
+    background-color: #3b3b3b;
+}
