@@ -13,6 +13,7 @@
 
 <link rel="icon" href="../../../static/images/favicon.png" sizes="16x16" type="image/png">
 
+<link href="https://fonts.googleapis.com/css2?family=Biryani&display=swap" rel="stylesheet">
 
 <!-- Loading Static CSS -->
 <link rel="stylesheet" href="../../../static/css/generics/main.css" type="text/css">
@@ -535,6 +536,7 @@
 
 </style>
 
+
 </head>
 
 <body>
@@ -549,17 +551,16 @@
 <ul id="top_nav">
   <li><a>LGIR</a></li>
   <li><a href="../../../dashboard">Dashboard</a></li>
-  <li><a>Account Settings</a></li>
+  <li><a id="project-workspace-button" href="../<%=code%>"><%=name%> Workspace</a></li>
+  <li><a class="active-link" style="padding-bottom: 10px;" href="">Settings</a></li>
   <li class="project-specific"><a id="create-component-button">Create Component</a></li>
   <li><a id="review-button">Leave Feedback</a></li>
   <li style="float:right"><a href="./../../../../logout">Logout <%= username %></a></li>
 </ul>
 
-
 <div id="progress-bar">
   <div id="progress-image"></div>
 </div>
-
 
 <div id="main">
 
@@ -613,8 +614,6 @@
       <div class="project-remove-button"><div id="delete-project-button">Delete</div></div>
       <div class="space"></div>
 
-
-
     </div>
 
     <div id="code-settings">
@@ -644,42 +643,57 @@
   </div>
 </div>
 
-<!-- Defining the main container for the page -->
-<!-- <div id="main">
-  <div class="content-container">
-    <div class="content-container-item">
-      <h1>Component Mappings</h1>
-      <button id="new-row">Create New Row</button>
-      <div class="mapping-grid" id="component-grid">
-        <div class="mapping-grid-item ">Virtual Component</div>
-        <div class="mapping-grid-item">Physical Component</div>  
-        <div class="mapping-grid-item">Remove</div>
-      </div>
-    </div>
-    <div class="content-container-item">
-      <h1>Project Users</h1>
-      <div class="user-grid" id="user-grid">    
-        <div class ="mapping-grid-item">Username</div>
-        <div class="mapping-grid-item">Role</div>
-        <div class="mapping-grid-item">Remove</div>
-      </div>
-    </div>
-  </div>
-</div> -->
-
 <script>
 
-  var socket = io()
-  
+  //Project Specific Functions
+
+  function RandomNumeric(length) {
+    var numerics = "0123456789"
+    var string = ""
+
+    for (let i = 0; i < length; i++) {
+        string += numerics[Math.floor(Math.random() * numerics.length)]
+    }
+
+    return string
+  }
+
+  function GetNewComponentId() {
+
+    var string = ""
+
+    string += RandomNumeric(10)
+    string += "-"
+    string += RandomNumeric(10)
+    string += "-"
+    string += RandomNumeric(10)
+    string += "-"
+    string += RandomNumeric(10)
+
+    return string
+  }
+
+
+
+
+
   var token =  "<%= token %>"
   var code = "<%= code %>"
   var name = "<%= name %>"
   var description = "<%= description %>"
 
+  var socket = io()
+
+  socket.emit("authenticate", {
+    "token" : token,
+    "code" : code
+  })
+
 
   var reviewArea = document.getElementById("review-area")
   var reviewButton = document.getElementById("review-button");
   var reviewAreaStatus = false
+  var projectWorkspaceButton = document.getElementById("project-workspace-button")
 
   var feedbackSendButton = document.getElementById("feedback-send-button")
 
@@ -724,13 +738,14 @@
     
   feedbackSendButton.addEventListener("click",function(){
 
-      socket.emit({
-          "page" : "project-settings",
-          "question1" : q1slider.value,
-          "question2" : q2slider.value,
-          "question3" : q3slider.value,
-          "question4" : additionalFeedback
-      })
+    socket.emit("feedback",{
+      "page" : "project-settings",
+      "question1" : q1slider.value,
+      "question2" : q2slider.value,
+      "question3" : q3slider.value,
+      "question4" : additionalFeedback.value
+    })
+
 
       reviewArea.innerHTML = "<h1>Thanks!</h1><h2>Your feedback has been submitted.</h2>"
 
@@ -750,8 +765,10 @@
 
 
   projectNameInput.addEventListener("input",function(e){
+
+    projectWorkspaceButton.textContent = e.target.value + " Workspace"
+
     socket.emit("project_name",{
-      "token" : token,
       "code" : code,
       "name" : e.target.value
     })
@@ -759,7 +776,6 @@
 
   projectDescriptionInput.addEventListener("input",function(e){
     socket.emit("project_description",{
-      "token" : token,
       "code" : code,
       "description" : e.target.value
     })
@@ -767,7 +783,6 @@
 
   projectDeleteButton.addEventListener("click", function() {
     socket.emit("project_delete",{
-      "token" : token,
       "code" : code
     })
   })
@@ -837,17 +852,18 @@
     userRow.appendChild(userRowUsername)
 
     let userRowRole = document.createElement("div")
-    let userRowRoleSelect = document.createElement("select")
-    let userRowRoleOptionOwner = document.createElement("option")
-    userRowRoleOptionOwner.textContent = "Owner"
-    userRowRoleSelect.appendChild(userRowRoleOptionOwner)
-    let userRowRoleOptionCollab = document.createElement("option")
-    userRowRoleOptionCollab.textContent = user.type
-    userRowRoleOptionCollab.selected = "true"
-    userRowRoleSelect.appendChild(userRowRoleOptionCollab)
-    userRowRole.appendChild(userRowRoleSelect)
+    userRowRoleButton = document.createElement("a")
+    userRowRoleButton.textContent = "Make Owner"
+
+    userRowRoleButton.addEventListener("click", function(){
+    
+    })
+
+    userRowRole.append(userRowRoleButton)
     userRowRole.classList.add("role")
     userRow.appendChild(userRowRole)
+
+
 
     let userRowRemove = document.createElement("div")
     userRowRemove.classList.add("remove")
@@ -855,7 +871,6 @@
     userRowRemove.addEventListener("click", function(){
       userRow.remove()
       socket.emit("project_deleteuser",{
-        "token" : token,
         "code" : code,
         "userToRemove" : user.username
       })
@@ -879,9 +894,6 @@
 
 
 
-
-
-
   function GeneratePinMappingJSON(name,type,pins) {
     let pinMappingJSON = {
       "components" : {
@@ -895,9 +907,8 @@
     return pinMappingJSON
   }
 
-  function InjectPinMapTemplate(div,pins) {
-
-
+  function InjectPinMapTemplate(div,pins,componentId) {
+    
     for (let i = 0; i < pins; i++) {
 
       let mapTemplateText = document.createElement("div")
@@ -917,145 +928,296 @@
       mapTemplateInput.classList.add("input")
       mapTemplateInputBox = document.createElement("input")
       mapTemplateInput.appendChild(mapTemplateInputBox)
+
+      mapTemplateInput.addEventListener("keyup",function(){
+        let pinMap = []
+        for (var i = 1; i < pins * 2; i+=2) {
+          pinMap.push(div.childNodes[i].childNodes[0].value)
+        }
+
+        socket.emit("project_update_component", {
+          "code" : code,
+          "componentId" : componentId,
+          "property" : "pins",
+          "value" : pinMap
+        })
+
+      })
+
       div.appendChild(mapTemplateInput)
     }
   }
 
 
+  class Component {
 
-  function CreateComponentRow(component) {
+
+    constructor(component) {
+
+      this.id = component.componentId
+      this.name = component.name
+      this.pins = component.pins
+
+    
+
+      if (component.component == "") {
+        this.component = "Light Emitting Diode (LED)"
+      }
+      else {
+        this.component = component.component
+      }
+  
+      this.element = document.createElement("div")
+
+      let componentRowColour = document.createElement("div")
+      let componentRowVirtual = document.createElement("div")
+      let componentRowPhysical = document.createElement("div")
+      let componentRowRemove = document.createElement("div")
+
+      this.element.appendChild(componentRowColour)
+      this.element.appendChild(componentRowVirtual)
+      this.element.appendChild(componentRowPhysical)
+      this.element.appendChild(componentRowRemove)
+
+      //Component Row Colour
+      componentRowColour.classList.add(GetRandomColour(["teal","pink"]),"colour")
+
+      //Component Row Virtual
+      componentRowVirtual.classList.add("virtual-component")
+      componentRowVirtual.appendChild(document.createElement("div"))
+
+      // Component Row Physical
+      this.componentRowPhysicalSelect = document.createElement("select")
+
 
     
 
-    let componentRow = document.createElement("div")
-
-
-    let componentRowColour = document.createElement("div")
-
-    componentRowColour.classList.add(GetRandomColour(["teal","pink"]),"colour")
-
-
-    componentRow.appendChild(componentRowColour)
-
-
-    let componentRowVirtual = document.createElement("div")
-
-    componentRowVirtual.classList.add("virtual-component")
-
-    componentRowVirtual.appendChild(document.createElement("div"))
-
-
-    
-    let componentRowPhysicalSelect = document.createElement("select")
-
-
-    for (let option in componentJSON) {
-    
-
-      let componentOption = document.createElement("option")
-      componentOption.textContent = option
-
-      if (option == "Light Emitting Diode (LED)") {
-        componentOption.selected = "true"
+      //Component Row Physical Dropdown
+      for (let option in componentJSON) {
+        let componentOption = document.createElement("option")
+        componentOption.textContent = option
+        if (option == this.component) {
+          componentOption.selected = "true"
+        }
+        this.componentRowPhysicalSelect.appendChild(componentOption)
       }
 
-      componentRowPhysicalSelect.appendChild(componentOption)
+      //Component Row Physical Select
+      this.componentRowPhysicalSelect.addEventListener("change",function(e){
+        if (e.target.value in componentJSON) {
+          this.componentRowPhysicalGrid.innerHTML = ""
+          InjectPinMapTemplate(this.componentRowPhysicalGrid,componentJSON[e.target.value].pins,this.id)
+
+          socket.emit("project_update_component",{
+            "code" : code,
+            "componentId" : this.id,
+            "property" : "component",
+            "value" : e.target.value
+          })
+
+        }
+      }.bind(this))
+      
+      componentRowVirtual.appendChild(this.componentRowPhysicalSelect)
+      componentRowVirtual.appendChild(document.createElement("div"))
+      
+      this.componentRowVirtualInput = document.createElement("input")
+
+      this.componentRowVirtualInput.addEventListener("keyup",function(e){
+      
+        socket.emit("project_update_component",{
+          "code" : code,
+          "componentId" : this.id,
+          "property" : "name",
+          "value" : e.target.value
+        })
+
+      }.bind(this))
+
+      if (this.name == "") {
+        this.componentRowVirtualInput.placeholder = "Component Name"
+      }
+      else {
+        this.componentRowVirtualInput.value = this.name
+      }
+
+      componentRowVirtual.appendChild(this.componentRowVirtualInput)
+
+      componentRowVirtual.appendChild(document.createElement("div"))
+
+      this.element.appendChild(componentRowVirtual)
+
+
+      componentRowPhysical.classList.add("physical-component")
+
+      this.componentRowPhysicalGrid = document.createElement("div")
+
+      componentRowPhysical.appendChild(this.componentRowPhysicalGrid)
+
+      this.element.appendChild(componentRowPhysical)
+
+      InjectPinMapTemplate(this.componentRowPhysicalGrid,componentJSON[this.component].pins,this.id)
+
+
+      componentRowRemove.classList.add("remove")
+
+      var componentRowRemoveButton = document.createElement("div")
+      componentRowRemoveButton.classList.add("remove-button")
+      componentRowRemoveButton.textContent = "Delete"
+      componentRowRemoveButton.addEventListener("click",function(){
+        this.element.remove()
+
+        socket.emit("project_delete_component", {
+          "code" : code,
+          "componentId" : this.id
+        })
+
+      }.bind(this))
+
+      componentRowRemove.appendChild(componentRowRemoveButton)
+
+      this.element.appendChild(componentRowRemove)
+
+      let j = 1
+      for (var i = 0; i < this.pins.length; i++) {
+        this.componentRowPhysicalGrid.childNodes[j].childNodes[0].value = this.pins[i]
+        j+=2
+      }
+
+      mappingList.appendChild(this.element)
+
+    }
+
+    ChangeName(newName) {
+      this.componentRowVirtualInput.value = newName
+    }
+
+    ChangeComponent(newComponent) {
+
+      for (var i = 0; i < this.componentRowPhysicalSelect.length; i++) {
+        this.componentRowPhysicalSelect[i].selected = ""
+      }
+
+      for (var i = 0; i < this.componentRowPhysicalSelect.length; i++) {
+        if (this.componentRowPhysicalSelect[i].textContent == newComponent) {
+          this.componentRowPhysicalSelect[i].selected = "true"
+        }
+      }
+
+      this.componentRowPhysicalGrid.innerHTML = ""
+      InjectPinMapTemplate(this.componentRowPhysicalGrid,componentJSON[newComponent].pins,this.id)
+
     }
 
 
-    componentRowPhysicalSelect.addEventListener("change",function(e){
-      
-
-      if (e.target.value in componentJSON) {
-        
-        componentRowPhysicalGrid.innerHTML = ""
-        InjectPinMapTemplate(componentRowPhysicalGrid,componentJSON[e.target.value].pins)
+    UpdatePins(newPins) {
+      let actualPin = 0
+      for (var i = 1; i < newPins.length * 2; i+=2) {
+        this.componentRowPhysicalGrid.childNodes[i].childNodes[0].value = newPins[actualPin]
+        actualPin++
       }
-
-    })
-
-    //OPTIONS END
-
-    componentRowVirtual.appendChild(componentRowPhysicalSelect)
-
-
-
-    componentRowVirtual.appendChild(document.createElement("div"))
-
-
-    let componentRowVirtualInput = document.createElement("input")
-
-    componentRowVirtualInput.placeholder = "Component Name"
-
-    componentRowVirtualInput.addEventListener("blur",function(e){
-      
-      let pinMap = {}
-
-      for (let i = 1; i < componentJSON[componentRowPhysicalSelect.value].pins * 2; i+=2) {
-        pinMap[(i+1)/2] = componentRowPhysical.childNodes[0].childNodes[i].childNodes[0].value
-      }
-
-      let pinMappingJSON = GeneratePinMappingJSON(e.target.value,componentRowPhysicalSelect.value,pinMap)
-
-      console.log(pinMappingJSON)
-
-    })
-
-    componentRowVirtual.appendChild(componentRowVirtualInput)
-    
-    componentRowVirtual.appendChild(document.createElement("div"))
-
-    componentRow.appendChild(componentRowVirtual)
-
-
-    let componentRowPhysical = document.createElement("div")
-    
-    componentRowPhysical.classList.add("physical-component")
-
-    let componentRowPhysicalGrid = document.createElement("div")
-
-    InjectPinMapTemplate(componentRowPhysicalGrid,1)
-
-    componentRowPhysical.appendChild(componentRowPhysicalGrid)
-
-    componentRow.appendChild(componentRowPhysical)
-
-
-    let componentRowRemove = document.createElement("div")
-
-
-    componentRowRemove.classList.add("remove")
-
-    componentRowRemoveButton = document.createElement("div")
-    componentRowRemoveButton.classList.add("remove-button")
-    componentRowRemoveButton.textContent = "Delete"
-    componentRowRemoveButton.addEventListener("click",function(){
-      componentRow.remove()
-    })
-    componentRowRemove.appendChild(componentRowRemoveButton)
-
-    componentRow.appendChild(componentRowRemove)
-
-    mappingList.appendChild(componentRow)
-
+    }
   }
 
+  var localComponents = []
 
-  CreateComponentRow({})
-  CreateComponentRow({})
-  CreateComponentRow({})
-  CreateComponentRow({})
-  CreateComponentRow({})
-  CreateComponentRow({})
-  CreateComponentRow({})
-  CreateComponentRow({})
-  CreateComponentRow({})
-  CreateComponentRow({})
-  CreateComponentRow({})
+  var createComponentButton = document.getElementById("create-component-button")
+  createComponentButton.addEventListener("click", function(){
+
+    let componentId = GetNewComponentId()
+
+    localComponents.push(new Component({
+      "componentId" : componentId,
+      "name" : "",
+      "component" : "",
+      "pins" : [""]
+    }))
 
 
+    socket.emit("project_create_component", {
+      "code" : code,
+      "componentId" : componentId
+    })
 
   
+
+  })  
+
+  socket.on("project_create_component", function(msg) {
+
+    localComponents.push(new Component({
+      "componentId" : msg.componentId,
+      "name" : "",
+      "component" : "",
+      "pins" : [""]
+    }))
+  })
+
+  socket.on("project_name_update", function(msg) {
+    projectNameInput.value = msg.name
+  }) 
+
+  socket.on("project_description_update", function(msg) {
+    projectDescriptionInput.value = msg.description
+  })
+
+  socket.on("project_delete_component", function(msg) {
+    for (var i = 0; i < localComponents.length; i++) {
+      if (localComponents[i].id == msg.componentId) {
+        localComponents[i].element.remove()
+        localComponents.splice(i,1)
+        break
+      }
+    }
+  })
+
+  socket.on("project_update_component", function(msg) {
+
+    for (var i = 0; i < localComponents.length; i++) {
+
+  
+      if (localComponents[i].id == msg.componentId) {
+
+
+        if (msg.property == "name") {
+          localComponents[i].ChangeName(msg.value)
+        }
+        else if (msg.property == "component") {
+          localComponents[i].ChangeComponent(msg.value)
+        }
+        else if (msg.property == "pins") {
+          localComponents[i].UpdatePins(msg.value)
+        }
+        break
+      }
+    }
+  })
+
+  
+  let pins;
+
+  <% components.forEach(function(component){ %>
+
+    pins = []
+    <% component.pins.forEach(function(pin){ %>
+      
+      pins.push("<%= pin %>")
+  
+    <% }) %>
+
+    localComponents.push(new Component({
+      "componentId" : "<%= component.componentId %>",
+      "name" : "<%= component.name %>",
+      "component" : "<%= component.component %>",
+      "pins" : pins
+    }))
+
+  <% }) %>
+
+
+
+
+
 </script>
 </body>
 </html>

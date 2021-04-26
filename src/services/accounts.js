@@ -1,40 +1,44 @@
 const Generators = require("./generators")
 
-var wsBindings = [
+var socketAnticipations = {
+   
+}
 
-]
+var authenticatedSockets = {
+
+}
 
 
-function AddBinding(username) {
-    token = Generators.RandomToken()
-    wsBindings.push({[token] : username})
+
+function GetToken(username) {
+    let token = Generators.Token()
+    socketAnticipations[token] = username
     return token
 }
 
-function ClearBindings(username) {
-    delete wsBindings[username]
+function PresentToken(socketId,token) {
+    if (token in socketAnticipations) {
+        authenticatedSockets[socketId] = socketAnticipations[token]
+        delete socketAnticipations[token]
+    }
 }
 
-function AuthenicateToken(token) {
+function Authenticate(socketId) {
+    return socketId in authenticatedSockets
+}
 
-    for (let i = 0; i < wsBindings.length; i++) {
-
-        if (wsBindings[i][token]) {
-            return {
-                "auth" : true,
-                "username" : wsBindings[i][token]
-            }
-        }
-    }
-
-    return {
-        "auth" : false
-    }
-
+function GetUsernameBySocket(socketId) {
+    return authenticatedSockets[socketId]
 }
 
 
-exports.AddBinding = AddBinding
-exports.AuthenticateToken = AuthenicateToken
+function RemoveSocket(socketId) {
+    delete authenticatedSockets[socketId]
+}
 
 
+exports.Authenticate = Authenticate
+exports.GetUsernameBySocket = GetUsernameBySocket
+exports.RemoveSocket = RemoveSocket
+exports.PresentToken = PresentToken
+exports.GetToken = GetToken

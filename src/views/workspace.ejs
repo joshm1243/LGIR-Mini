@@ -4,21 +4,30 @@
 
 <title>LGIR: Workspace</title>
 
+<script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Biryani&display=swap" rel="stylesheet">
+
 <!-- Including the blockly application from the static files directory -->
-<!-- <script src="{% static 'application/blockly/google-blockly-edd475f/blockly_compressed.js' %}"></script>
-<script src="{% static 'application/blockly/google-blockly-edd475f/blocks_compressed.js' %}"></script>
-<script src="{% static 'application/blockly/google-blockly-edd475f/javascript_compressed.js' %}"></script>
-<script src="{% static 'application/blockly/google-blockly-edd475f/python_compressed.js' %}"></script>
-<script src="{% static 'application/blockly/google-blockly-edd475f/msg/js/en.js' %}"></script> -->
+<script src="./../../static/application/blockly/google-blockly-edd475f/blockly_compressed.js"></script>
+<script src="./../../static/application/blockly/google-blockly-edd475f/blocks_compressed.js"></script>
+<script src="./../../static/application/blockly/google-blockly-edd475f/javascript_compressed.js"></script>
+<script src="./../../static/application/blockly/google-blockly-edd475f/python_compressed.js"></script>
+<script src="./../../static/application/blockly/google-blockly-edd475f/msg/js/en.js"></script>
 
 <link rel="icon" href="../../../static/images/favicon.png" sizes="16x16" type="image/png">
 
+<script src="/socket.io/socket.io.js"></script>
+
+<script>
+  var token =  "<%= token %>"
+  var code = "<%= code %>"
+</script>
 
 <!-- Loading Static CSS -->
 <link rel="stylesheet" href="./../../static/css/generics/main.css" type="text/css">
-<link rel="stylesheet" href="./../../static/css/generics/chat.css" type="text/css">
-<link rel="stylesheet" href="./../../static/css/generics/navigation.css" type="text/css">
-<link rel="stylesheet" href="./../../static/css/generics/workpspace.css" type="text/css">
+<link rel="stylesheet" href="./../../static/css/application/chat.css" type="text/css">
+<link rel="stylesheet" href="./../../static/css/application/workspace.css" type="text/css">
+<link rel="stylesheet" href="./../../static/css/application/monitor.css" type="text/css">
 
 </head>
 
@@ -26,34 +35,60 @@
 <!-- Defining the page navigation bars -->
 <ul id="top_nav">
   <li><a id="site-title">LGIR</a></li>
-  <li><a href="./../../../dashboard/">Dashboard</a></li>
-  <li><a>Account Settings</a></li>
-  <li style="float:right"><a>Logout</a></li>
-</ul>
-
-<ul id="mobile-top-nav">
-  <li><a>&#9776</a></li>
-  <li><a>LGIR</a></li>
-</ul>
-
-<ul id="project_nav">
-  <li><a>{{ appcode }}</a></li>
+  <li><a href="./../../../dashboard">Dashboard</a></li>
+  <li><a href="../<%=code%>" id="project-workspace-button" class="active-link" style="padding-bottom: 10px;"><%=name%> Workspace</a></li>
+  <li><a href="<%=code%>/settings">Settings</a></li>
   <li><a id="toggle-monitor">Monitor</a></li>
   <li><a id="request-edit">Edit</a>
   <li><a id="download-code">Download Code</a></li>
   <li><a id="toggle-chat">Chat</a></li>
-  <li><a href="../settings/">Project Settings</a></li>
+  <li><a id="review-button" style="display: none;">Leave Feedback</a></li>
+  <li style="float:right"><a href="./../../logout">Logout <%= username %></a></li>
 </ul>
-
 
 <!-- Defining the main container for the page -->
 <div id="main">
+
+  <div id="review-area">
+
+    <h1 id="review-area-title">Project Settings Page Feedback</h1>
+    <h2>On a scale of 0 to 10, how would you rate the page on the following topics?</h2>
+    <div id="question-grid">
+        <div class="text" id="q1text"></div>
+        <div class="slider-container">
+            <p>Question 1</p>
+            <input type="range" min="0" max="10" value="5" class="slider" id="q1slider">
+            <p id="q1output">5</p>
+        </div>
+        <div></div>
+
+        <div class="text" id="q2text"></div>
+        <div class="slider-container">
+            <p>Question 2</p>
+            <input type="range" min="0" max="10" value="5" class="slider" id="q2slider">
+            <p id="q2output">5</p>
+        </div>
+        <div></div>
+
+        <div class="text" id="q3text"></div>
+        <div class="slider-container">
+            <p>Question 3</p>
+            <input type="range" min="0" max="10" value="5" class="slider" id="q3slider">
+            <p id="q3output">5</p>
+        </div>
+        <div></div>
+    </div>
+    <input placeholder="Extra Text Feedback" id="review-area-additional">
+    <a id="feedback-send-button">Send Feedback</a>
+
+  </div>
+
 
   <!-- Holds all items relating to Blockly -->
   <div id="workspace-area">
     <div id="blockly-wrapper">
       <div id="workspace-loading-message">
-        <h1>Loading the workspace</h1>
+        <h1>Loading the Workspace</h1>
       </div>
 
       <div id="allow-edit-message" style="display: none">
@@ -88,15 +123,61 @@
         <h1>What a silly billy!</h1>
         <h2>You're already the editor.</h2>
       </div>
+
+      <div id="already-users-waiting" style="display: none">
+        <h1>It's busy today!</h1>
+        <h2>There's already a user waiting to edit the project.</h2>
+      </div>
+
+      <div id="incorrect-json-message" style="display: none">
+        <h1>Whoops!</h1>
+        <h2>Those results weren't quite in the correct format.</h2>
+        <h2>Only JSON Formatted Results From LGIR Python Are Allowed.</h2>
+      </div>
+
+      <div id="fatal-error-message" style="display: none">
+        <h1>Oh, that's actually not great.</h1>
+        <h2>A fatal error has occurred.</h2>
+        <h2>You can attempt to use the workspace however key features may not function.</h2>
+      </div>
+
+      
+      <div id="incorrect-syntax-message" style="display: none">
+        <h1>Syntax Error</h1>
+        <h2>Have a check over your program, looks like some items are missing.</h2>
+      </div>
     </div>
     
     <div id="blockly-container" style="flex: 1;"></div>
-    <div id="monitor-container" style="flex: 1;"></div>
+    <div id="monitor-container" style="flex: 1;">
+
+      <div id="monitor-inception-container">
+        <div id="monitor-navigation">
+          <ul>
+            <select id="results-dropdown"></select>
+            <li><a id="upload-results-button">Upload</a></li>
+            <li><a class="bucket-select" onclick="ShowBucketPage(1)">1-4</a></li>
+            <li><a class="bucket-select" onclick="ShowBucketPage(2)">5-8</a></li>
+            <li><a class="bucket-select" onclick="ShowBucketPage(3)">9-12</a></li>
+            <li><a class="bucket-select" onclick="ShowBucketPage(4)">13-16</a></li>
+          </ul>
+        </div>
+        <div id="monitor-results">
+          <textarea id="upload-results-area" placeholder="PASTE PROGRAM OUTPUT HERE"></textarea>
+          <div id="bucket-container"></div>
+        </div>
+
+    </div>
+  </div> 
+
   </div>
 
+
+
+  
   <!-- Holds all items relating to chat messages -->
   <div id="chat-container">
-    <div id="chat-header">{{appcode}} chat</div>
+    <div id="chat-header"><%=name%> chat</div>
     <div id="chat-display-container"></div>
     <div id="chat-input-container"><input id="chat-input" placeholder="Please input your text here"></div>
   </div>
@@ -104,9 +185,84 @@
 
 <div id="blocklyDiv" style="position: absolute;"></div>
 
-<script src="{% static 'application/custom_blocks/structs.js' %}"></script>
-<script src="{% static 'application/custom_blocks/logic.js' %}"></script>
-<script src="{% static 'application/custom_workspace/toolbox.js' %}"></script>
+<script src="./../../static/application/custom_blocks/structs.js"></script>
+<script src="./../../static/application/custom_blocks/logic.js"></script>
+<script src="./../../static/application/custom_blocks/stubs.js"></script>
+<script src="./../../static/application/custom_workspace/toolbox.js"></script>
+
+<script>
+  
+  var reviewArea = document.getElementById("review-area")
+  var reviewButton = document.getElementById("review-button");
+  var reviewAreaStatus = false
+  var projectWorkspaceButton = document.getElementById("project-workspace-button")
+
+  var feedbackSendButton = document.getElementById("feedback-send-button")
+
+  reviewButton.addEventListener("click", function(){
+
+    
+    if (reviewAreaStatus) {
+        reviewAreaStatus = false
+        reviewButton.textContent = "Leave Feedback"
+        reviewArea.style.display = "none"
+    }
+    else {
+        reviewAreaStatus = true
+        reviewButton.textContent = "Close Feedback"
+        reviewArea.style.display = "block"
+    }
+  })
+
+
+  var q1slider = document.getElementById("q1slider")
+  var q2slider = document.getElementById("q2slider")
+  var q3slider = document.getElementById("q3slider")
+
+  var q1Output = document.getElementById("q1output")
+  var q2Output = document.getElementById("q2output")
+  var q3Output = document.getElementById("q3output")
+  
+  var additionalFeedback = document.getElementById("review-area-additional")
+
+  q1slider.addEventListener("input",function(e){
+      q1Output.textContent = e.target.value
+  })
+
+  q2slider.addEventListener("input",function(e){
+      q2Output.textContent = e.target.value
+  })
+  
+  q3slider.addEventListener("input",function(e){
+      q3Output.textContent = e.target.value
+  })
+
+    
+  feedbackSendButton.addEventListener("click",function(){
+
+      socket.emit("feedback",{
+        "page" : "workspace",
+        "question1" : q1slider.value,
+        "question2" : q2slider.value,
+        "question3" : q3slider.value,
+        "question4" : additionalFeedback.value
+      })
+
+      reviewArea.innerHTML = "<h1>Thanks!</h1><h2>Your feedback has been submitted.</h2>"
+
+
+      setTimeout(function(){
+          reviewArea.style.display = "none"
+          reviewButton.style.display = "none"
+      },2500)
+
+      reviewButton.textContent = "Leave Feedback"
+      reviewAreaStatus = false
+
+  })
+
+
+</script>
 
 
 <xml xmlns="https://developers.google.com/blockly/xml" id="toolbox" style="display: none">
@@ -424,96 +580,57 @@
     </block>
   </category>
   <sep></sep>
-  <category name="Robotics Input" colour="#5b80a5">
-    <block type="add"></block>
-    <block type="input_component"></block>
-    <block type="value_of"></block>
-  </category>
-  <category name="Robotics Output" colour="#745ba5">
-    <block type="output_component"></block>
-    <block type="pin_component"></block>
-    <block type="set"></block>
-    <block type="speed"></block>
+
+  <category name="Robotics" colour="#5b80a5">
     <block type="wait"></block>
-    <block type="ON_or_OFF"></block>
-    <block type="Brightness"></block>
+    <block type="set"></block>
+    <block type="add"></block>
+    <block type="speed"></block>
+    <block type="brightness"></block>
+    <block type="power"></block>
+    <block type="bucket"></block>
   </category>
+
   <sep></sep>
   <category name="Functions" colour="#995ba5" custom="PROCEDURE"></category>
   <category name="Variables" colour="#a55b80" custom="VARIABLE"></category>
 </xml>
 
-<script>  
-  var wsKey = '{{ websocket_key }}'
-</script>
 
 <!-- Getting the project data from the views args -->
 <script>
-  var blocklyXMLString = '{{ workspace_data }}';
+  var parser = new DOMParser();
+  var workspaceString = "<%= workspace %>"
+  var workspaceXML = parser.parseFromString('<%= workspace %>',"text/html");
 </script>
 
 
 <!-- Defining resize functions -->
-<script src="{% static 'application/workspace/resize.js' %}"></script>
+<script src="./../../static/application/workspace/resize.js"></script>
 
 <!-- Injecting Blockly-->
-<script src="{% static 'application/workspace/blockly_inject.js' %}"></script>
-
-
-<!-- Chat -->
-<script src="{% static 'application/workspace/chat.js' %}"></script>
+<script src="./../../static/application/workspace/blockly_inject.js"></script>
 
 <!-- Websockets -->
-<script src="{% static 'application/workspace/socket.js' %}"></script>
+<script src="./../../static/application/workspace/socket.js"></script>
 
+<!-- Chat -->
+<script src="./../../static/application/workspace/chat.js"></script>
+
+<!--Monitor-->
+<script src ="./../../static/application/workspace/monitor.js"></script>
+ 
 <script>
-/*
-//Waiting for the download code button to be clicked
-document.getElementById("download-code").addEventListener("click",function(){
-Blockly.JavaScript.INFINITE_LOOP_TRAP = null;
-<script>
-  //   //Waiting for the download code button to be clicked
-  //   document.getElementById("download-code").addEventListener("click",function(){
-  //   Blockly.JavaScript.INFINITE_LOOP_TRAP = null;
-    //Append the virtual button to the main tag
-    var main = document.getElementById("main")
-    document.body.appendChild(virDownloadButton)
-    virDownloadButton.click()
-    document.body.removeChild(virDownloadButton)
-    
-  })
-  */
-  //   //Append the virtual button to the main tag
-  //   var main = document.getElementById("main")
-  //   document.body.appendChild(virDownloadButton)
-  //   virDownloadButton.click()
-  //   document.body.removeChild(virDownloadButton)
-  // })
-  
+
+socket.emit("get_mapping",{
+  "code" : code
+})
+
+socket.on("get_mapping", function(msg){
+  console.log(msg)
+})
+
 </script>
-
-<!-- <script>
-  // Definition Block
-var pin = 0;
-var pos = 1;
-Blockly.Blocks['Pin_Value'] = {
-  innit: function() {
-    this.appendValueInput('VALUE')
-        .setCheck('Number')
-        .appendField('value is ');
-    this.setOutput(true, 'PIN: ', pin, 'AT', pos);
-    this.setColour(160);
-    this.setPreviousStatement(true); 
-    this.setNextStatement(true); 
-  }
-};
-// Block input types - value, statement or dummy.
-  // Generator Stub
-Blockly.Javascript['Pin_Value'] = function(block){
-  var code = '...;\n';
-  return code;
-}
-</script> -->
 
 </body>
 </html>

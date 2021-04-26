@@ -24,16 +24,16 @@ function RandomString(length) {
 
     var string = ""
 
-    string += RandomAlpha(2)
+    string += RandomAlpha(1)
     string += RandomNumeric(2)
-    string += RandomAlpha(3)
-    string += RandomNumeric(1)
+    string += RandomAlpha(2)
+    string += RandomNumeric(3)
 
     return string
 }
 
 
-function RandomToken() {
+function Token() {
     var token = ""
     for (let i = 0; i < 8; i++) {
         token += RandomString()
@@ -42,4 +42,4 @@ function RandomToken() {
 }
 
 exports.RandomString = RandomString
-exports.RandomToken = RandomToken
+exports.Token = Token

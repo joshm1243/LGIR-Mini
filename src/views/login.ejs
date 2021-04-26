@@ -4,6 +4,7 @@
     
     <title>LGIR: Login</title>
     <link rel="icon" href="static/images/favicon.png" sizes="16x16" type="image/png">
+    <link href="https://fonts.googleapis.com/css2?family=Biryani&display=swap" rel="stylesheet">
     
     <style>
 
@@ -32,6 +33,7 @@
             color: #FFFFFF;
             text-align: center;
             padding: 15px;
+            user-select: none;
             display: block;
         }
 
@@ -147,6 +149,15 @@
             background-color: #1b1b1b;
         }
 
+        .active-link {
+            border-style: solid;
+            border-top: 0px;
+            border-left: 0px;
+            border-right: 0px;
+            border-color: #00B199;
+            border-width: 5px;
+        }
+
 
         
     </style>
@@ -155,8 +166,8 @@
 <body>
   <ul id="top_nav">
     <li><a id="site-title">LGIR</a></li>
-    <li><a href="">Login</a></li>
-    <li style="float:right; user-select: none;"><a style="color: #888888;">lgirmini/0.9.1/05.04.21/22:48</a></li>
+    <li><a class="active-link" style="padding-bottom: 10px;">Login</a></li>
+    <li style="float:right; user-select: none;"><a style="color: #888888;">lgirmini/0.9.7/19.04.21/19:07</a></li>
   </ul>
 
   <div id = "main">
@@ -171,7 +182,7 @@
                 <h1 class="login-grid-title">Welcome to LGIR: <strong>Alpha</strong></h1>
                 <ul class="login-grid-messages">
                     <li>LGIR is currently in Alpha</li>
-                    <li>The application is stateless, no user data will be saved</li>
+                    <li>The application is stateless, although cookies are used</li>
                     <li>Please log in using the details you were provided with</li>
                 </ul>
                 <form class="login-grid-form" action="login/" method="POST">

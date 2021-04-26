@@ -130,10 +130,13 @@
 .tile {
     box-shadow: 10px 10px 15px #000000;
     transition: 0.5s;
+    text-decoration: none;
+    color: #FFFFFF;
 }
 
 .tile:hover {
     background-color: #181818;
+
     cursor: pointer;
     transition: 0.5s;
 }
@@ -396,14 +399,13 @@
     <!-- Defining the top navigation bar -->
     <ul id="top_nav">
         <li><a>LGIR</a></li>
-        <li><a>Dashboard</a></li>
-        <li><a>Account Settings</a></li>
+        <li><a class="active-link" style="padding-bottom: 10px;">Dashboard</a></li>
         <li class="project-specific"><a id="show-live-button">Show Live Projects</a></li>
         <li class="project-specific"><a id="create-project-button">Create Project</a></li>
         <li class="project-specific"><input id="project-join-input" type="text" value="Join Project with Code"></li>
         <li class="project-specific"><input id="project-search-input" style="width: 200px;" type="text" value="Search Projects"></li>
         <li><a id="review-button">Leave Feedback</a></li>
-        <li style="float:right"><a href="logout">Logout</a></li>
+        <li style="float:right"><a href="logout">Logout <%= username %></a></li>
     </ul>
 
     <div id="progress-bar">
@@ -463,7 +465,15 @@
 <script>
 
     //Creating a websocket connection to the server
-    var socket = io();
+    
+    var authToken =  "<%= token %>"
+    var socket = io()
+
+    socket.emit("authenticate", {
+        "token" : authToken
+    })
+
+
 
     var reviewArea = document.getElementById("review-area")
     var reviewButton = document.getElementById("review-button")
@@ -512,13 +522,13 @@
       
     feedbackSendButton.addEventListener("click",function(){
 
-        socket.emit({
-            "page" : "dashboard",
-            "question1" : q1slider.value,
-            "question2" : q2slider.value,
-            "question3" : q3slider.value,
-            "question4" : additionalFeedback
-        })
+        socket.emit("feedback",{
+          "page" : "dashboard",
+          "question1" : q1slider.value,
+          "question2" : q2slider.value,
+          "question3" : q3slider.value,
+          "question4" : additionalFeedback.value
+      })
 
         reviewArea.innerHTML = "<h1>Thanks!</h1><h2>Your feedback has been submitted.</h2>"
 
@@ -609,16 +619,13 @@
             TilesHide()
             serverMessage.style.display = "block"
         }
-    },1000)
+    },5000)
 
 
     createProjectButton.addEventListener("click",function(){
 
         if (!currentlyCreatingProject) {
-
-            socket.emit("project_create", {
-                "token" : token
-            })
+            socket.emit("project_create")
         }
     })
 
@@ -638,7 +645,6 @@
 
     <% }) %>
 
-    var token =  "<%= token %>"; 
 
 
     socket.on("project_join_reply", function(msg) {
@@ -734,18 +740,18 @@
         var projectWorkspace = document.createElement("a")
         projectWorkspace.textContent = "Workspace"
         projectWorkspace.classList.add("project__button")
-        projectWorkspace.href = "../application/" + code + "/workspace/"
+        projectWorkspace.href = "../app/" + code
         projectWorkspace.classList.add("project__workspace")
         projectTile.appendChild(projectWorkspace)
 
         var projectSettings = document.createElement("a")
         projectSettings.textContent = "Settings"
         projectSettings.classList.add("project__button")
-        projectSettings.href = "../application/" + code + "/settings/"
+        projectSettings.href = "../app/" + code + "/settings"
         projectSettings.classList.add("project__settings")
         projectTile.appendChild(projectSettings)
 
-        var projectRemove = document.createElement("a")
+        var projectRemove = document.createElement("div")
         projectRemove.textContent = "Remove"
         projectRemove.classList.add("project__button")
         projectRemove.classList.add("project__remove")
@@ -753,7 +759,6 @@
             projectTile.remove()
    
             socket.emit("project_remove",{
-                "token" : token,
                 "code" : code
             })
 
@@ -857,7 +862,6 @@
             projectJoinInput.style.color = "#00EEAA"
 
             socket.emit("project_join",{
-                "token" : token,
                 "code" : code
             })
 
@@ -945,7 +949,6 @@
 
 
 
-    
     socket.on("project_create_reply", function(msg) {
         projectJSON.push(msg)
         

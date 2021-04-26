@@ -151,3 +151,13 @@ input:focus{
 .project-specific {
     background-color: #3b3b3b;
 }
+
+
+.active-link {
+    border-style: solid;
+    border-top: 0px;
+    border-left: 0px;
+    border-right: 0px;
+    border-color: #00B199;
+    border-width: 5px;
+}

@@ -1,0 +1,205 @@
+#monitor-inception-container {
+    display: flex;
+    height:100%;
+}
+
+
+#monitor-inception-container ul {
+    list-style-type: none;
+    margin: 0;
+    text-align: center;
+    padding: 0;
+    width: 100px;
+    background-color: #646262;
+    height:100%;    
+}
+
+#monitor-inception-container li a {
+    display: block;
+    color: #ffffff;
+    text-decoration: none;
+}
+
+#monitor-results {
+  width: 1050px;  
+  height:100%;  
+  overflow: auto;
+}
+
+#results-container {
+  display: grid;
+  grid-template-columns: 50% 50%;
+  grid-gap: 10px;
+  background-color: #ffffff;
+}
+
+#results-container > div {
+  background-color: #313131;
+  color:snow;
+  text-align: center;
+  font-size: 30px;
+}
+
+.bucketSpace.table > div{
+  display:grid;
+  grid-template-columns: auto auto auto;
+  overflow: auto;
+  height: 250px;
+}
+
+.bucketSpace.table > div > div{
+  border: solid 3px honeydew;
+}
+
+textarea {
+  margin-top: 10px;
+  margin-left: 10px;
+  border: none;
+  outline: none;
+  transition: 0.5s;
+  background-color: #FFFFFF;
+  font-size: 2em;
+  font-family: 'Biryani', sans-serif; 
+  font-weight: 300;
+  display: none;
+}
+
+#results-dropdown {
+  background-color: #424242;
+  height: 30px;
+  border: none;
+  outline: none;
+  width: 100%;
+}
+
+.bucket-select {
+  cursor: pointer;
+  font-size: 1.1em;
+  padding-top: 10px;
+  height: 40px;
+}
+
+.bucket-select:hover {
+  background-color: #333333;
+}
+
+#bucket-container {
+  margin-top: 10px;
+  margin-left: 10px;
+  display: flex;
+  flex-direction: column;
+}
+
+.bucket {
+  display: grid;
+  gap: 10px;
+  grid-template-areas: "bucket__table bucket__name"
+  "bucket__table bucket__chart";
+  grid-template-rows: 40px 260px;
+  grid-template-columns: 500px 500px;
+}
+
+.bucket__table {
+  grid-area: "bucket__table";
+  grid-row: 1/3;
+  background-color: #303030;
+  margin-bottom: 10px;
+  overflow: auto;
+}
+
+.bucket__chart {
+  grid-area: "bucket__chart";
+  background-color: #dbdbdb;
+  margin-bottom: 10px;
+  overflow: hidden;
+}
+
+.bucket__name {
+  grid-area: "bucket__name";
+  background-color: #3B3B3B;
+  color: #FFFFFF;
+  font-size: 1.4em;
+  text-align: center;
+}
+
+.table-container-interior {
+  overflow: auto;
+  color: #FFFFFF;
+  font-size: 1.1em;
+  display: grid;
+  grid-template-columns: 0.5fr 1fr 1fr;
+}
+
+.table-container-interior .heading {
+  font-size: 1.2em;
+}
+
+.table-container-interior .heading-id {
+ 
+}
+
+.table-container-interior .heading-timestamp {
+  
+}
+
+.table-container-interior .heading-value {
+
+}
+
+.table-container-interior {
+  margin-left: 15px;
+  margin-top: 10px;
+}
+
+.table-container-interior .id {
+
+}
+
+.table-container-interior .timestamp {
+  
+}
+
+.table-container-interior .value {
+
+}
+
+#upload-results-button {
+  cursor: pointer;
+  font-size: 1.1em;
+  padding-top: 10px;
+  padding-bottom: 10px;
+}
+
+#upload-results-button:hover {
+  background-color: #333333;;
+}
+
+#results-dropdown {
+  color: #FFFFFF;
+  font-size: 1.2em;
+}
+
+#results-dropdown option {
+  color: #FFFFFF;
+  font-size: 1.1em;
+}
+
+#monitor-navigation ul {
+  transition: 0.4s;
+  width: 100px;
+}
+
+#monitor-navigation {
+  transition: 0.4s;
+  width: 100px;
+}
+
+#monitor-navigation:hover {
+  width: 200px;
+  transition: 0.4s;
+}
+
+#monitor-navigation ul:hover {
+  width: 200px;
+  transition: 0.4s;
+}
