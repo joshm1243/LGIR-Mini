@@ -36,13 +36,13 @@
 <ul id="top_nav">
   <li><a id="site-title">LGIR</a></li>
   <li><a href="./../../../dashboard">Dashboard</a></li>
-  <li><a href="../<%=code%>" id="project-workspace-button" class="active-link" style="padding-bottom: 10px;"><%=name%> Workspace</a></li>
+  <li><a href="../app/<%=code%>" id="project-workspace-button" class="active-link" style="padding-bottom: 10px;"><%=name%> Workspace</a></li>
   <li><a href="<%=code%>/settings">Settings</a></li>
   <li><a id="toggle-monitor">Monitor</a></li>
   <li><a id="request-edit">Edit</a>
   <li><a id="download-code">Download Code</a></li>
   <li><a id="toggle-chat">Chat</a></li>
-  <li><a id="review-button" style="display: none;">Leave Feedback</a></li>
+  <li style="display: none"><a id="review-button" style="display: none;">Leave Feedback</a></li>
   <li style="float:right"><a href="./../../logout">Logout <%= username %></a></li>
 </ul>
 
@@ -172,9 +172,6 @@
 
   </div>
 
-
-
-  
   <!-- Holds all items relating to chat messages -->
   <div id="chat-container">
     <div id="chat-header"><%=name%> chat</div>
@@ -192,6 +189,9 @@
 
 <script>
   
+
+  var projectName = "<%=name%>"
+
   var reviewArea = document.getElementById("review-area")
   var reviewButton = document.getElementById("review-button");
   var reviewAreaStatus = false
@@ -626,9 +626,6 @@ socket.emit("get_mapping",{
   "code" : code
 })
 
-socket.on("get_mapping", function(msg){
-  console.log(msg)
-})
 
 </script>
 
