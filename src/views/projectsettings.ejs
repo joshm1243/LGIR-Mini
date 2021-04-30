@@ -554,7 +554,7 @@
   <li><a id="project-workspace-button" href="../<%=code%>"><%=name%> Workspace</a></li>
   <li><a class="active-link" style="padding-bottom: 10px;" href="">Settings</a></li>
   <li class="project-specific"><a id="create-component-button">Create Component</a></li>
-  <li><a id="review-button">Leave Feedback</a></li>
+  <li style="display: none"><a id="review-button">Leave Feedback</a></li>
   <li style="float:right"><a href="./../../../../logout">Logout <%= username %></a></li>
 </ul>
 
@@ -611,7 +611,7 @@
       <div class="project-description">Description</div>
       <div class="project-description-input"><input id="project-description-input" value="<%=description%>"></div>
       <div class="project-remove">Delete Project</div>
-      <div class="project-remove-button"><div id="delete-project-button">Delete</div></div>
+      <div id="project-remove-button" class="project-remove-button"><div id="delete-project-button">Delete</div></div>
       <div class="space"></div>
 
     </div>
@@ -880,6 +880,21 @@
     userList.appendChild(userRow)
 
   }
+
+
+  let projectRemoveButton = document.getElementById("project-remove-button")
+  projectRemoveButton.addEventListener("click", function(){
+    
+    socket.emit("project-delete", {
+      "code" : code,
+    })
+
+    setTimeout(function(){
+
+      window.location.replace("../dashboard/")
+
+    },200)
+  })
 
 
 

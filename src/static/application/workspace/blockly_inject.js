@@ -11,12 +11,13 @@ function createBlockly(options) {
   
   var workspace = Blockly.inject(blocklyDiv, options);
   
-  
   if (workspaceString != "") {
-    
+
     var parsedWorkspaceXML = Blockly.Xml.textToDom(workspaceXML.documentElement.textContent)
+
     // Attempting to clear prior to import due to duplication glitch
     workspace.clear()
+
     //Imports the xml to the workspace
     Blockly.Xml.domToWorkspace(parsedWorkspaceXML, workspace)
 
@@ -85,32 +86,33 @@ function createBlockly(options) {
       var element = document.createElement('a');
       let encoding = "data:text/plain;charset=utf-8,"
 
-
       var code = "# Lightweight Graphical Interface for Robotics\n"
       code += "# Last LGIR Workspace Update: 0.9.6/12.04.21/23:41\n"
       code += "from random import randint\n"
       code += "from datetime import datetime\n"
+      code += "import time\n"
       code += "# LGIR Setup\n"
-      code += "time = lambda : datetime.now().strftime('%H:%M:%S')\n"
+      code += "getTime = lambda : datetime.now().strftime('%H:%M:%S')\n"
       code += "buckets = []\n"
       code += "for i in range(1,20) : buckets.append({'number':i,'bucketValues':[]})\n"
       code += "pinwrite = lambda pin, value : print('Write: Setting pin',pin,'to',value)\n"
       code += "def pinread(pin,bucket):\n"
       code += "    print('Read: Reading pin',pin,'and placing into bucket',bucket)\n"
-      code += "    buckets[bucket - 1]['bucketValues'].append({'timestamp':time(),'value':randint(0,30)})\n"
+      code += "    buckets[bucket - 1]['bucketValues'].append({'timestamp':getTime(),'value':randint(0,30)})\n"
       code += "def showresults():\n"
       code += "    print()\n"
       code += "    print('==================================== Test Results ===================================')\n"
       code += "    print('You can paste the results in to the workspace monitor page to view them more clearly.')\n"
       code += "    print()\n"
-      code += "    print(buckets)\n"
+      code += `    print(str(buckets).replace("'",'"'))\n`
       code += "# Program\n"
       code += Blockly.Python.workspaceToCode(workspace)
       code += "\n# Show Program Results\n"
       code += "showresults()"
 
       element.setAttribute('href', encoding + encodeURIComponent(code));
-      element.download = "filename.py"
+
+      element.download = "LGIR " + projectName + " " + GetTimestamp(false) + ".py"
       element.style.display = 'none';
       document.body.appendChild(element);
       element.click();

@@ -384,6 +384,8 @@
 }
 
 
+
+
 </style>
 <body>
 
@@ -398,13 +400,13 @@
 
     <!-- Defining the top navigation bar -->
     <ul id="top_nav">
-        <li><a>LGIR</a></li>
+        <li><a class="ignore-link" style="cursor: default">LGIR</a></li>
         <li><a class="active-link" style="padding-bottom: 10px;">Dashboard</a></li>
         <li class="project-specific"><a id="show-live-button">Show Live Projects</a></li>
         <li class="project-specific"><a id="create-project-button">Create Project</a></li>
         <li class="project-specific"><input id="project-join-input" type="text" value="Join Project with Code"></li>
         <li class="project-specific"><input id="project-search-input" style="width: 200px;" type="text" value="Search Projects"></li>
-        <li><a id="review-button">Leave Feedback</a></li>
+        <li style="display: none"><a id="review-button">Leave Feedback</a></li>
         <li style="float:right"><a href="logout">Logout <%= username %></a></li>
     </ul>
 
@@ -446,9 +448,7 @@
             </div>
             <input placeholder="Extra Text Feedback" id="review-area-additional">
             <a id="feedback-send-button">Send Feedback</a>
-        
-
-
+    
         </div>
 
         <div id="project-tiles"></div>
@@ -459,6 +459,10 @@
         <div id="server-message" class="message">
             <h1>We've lost connection to the server</h1>
             <h2>We'll let you know when the connection's back</h2>
+        </div>
+        <div id="no-projects-message" class="message">
+            <h1>You're not in any projects yet</h1>
+            <h2>Use the create project button to make a new one</h2>
         </div>
     </div>
     
@@ -617,12 +621,15 @@
         }
         else {
             TilesHide()
+            RemoveNoProjectsMessage()
             serverMessage.style.display = "block"
         }
     },5000)
 
 
     createProjectButton.addEventListener("click",function(){
+
+        RemoveNoProjectsMessage()
 
         if (!currentlyCreatingProject) {
             socket.emit("project_create")
@@ -641,21 +648,21 @@
             "name" : "<%= project.name %>",
             "code" : "<%= project.code %>",
             "users" : "<%= project.users %>",
+            "date" : "<%= project.date %>"
         })
 
     <% }) %>
-
-
-
     socket.on("project_join_reply", function(msg) {
 
         if(msg.joined) {
 
             ResetSearch()
 
+            RemoveNoProjectsMessage()
+
             projectJSON.push(msg.project)
             
-            CreateProjectTile(msg.project.name,msg.project.code,msg.project.users)
+            CreateProjectTile(msg.project.name,msg.project.code,msg.project.users,msg.project.date)
             projectJoinInput.classList.remove("block-text")
             projectJoinInput.style.color = "#00ff0094"
             projectJoinInput.value = "Added You To That Project"
@@ -695,6 +702,16 @@
         searchMessage.style.display = "none"
     }
     
+
+    let noProjectsMessage = document.getElementById("no-projects-message")
+
+    function ShowNoProjectsMessage() {
+        noProjectsMessage.style.display = "block"
+    }
+
+    function RemoveNoProjectsMessage() {
+        noProjectsMessage.style.display = "none"
+    }
     
     function ResetSearch() {
 
@@ -712,7 +729,7 @@
         return colours[Math.floor(Math.random() * colours.length)]
     }
 
-    function CreateProjectTile(name,code,users) {
+    function CreateProjectTile(name,code,users,date) {
 
         var projectTile = document.createElement("div")
         projectTile.classList.add("project","darker-grey","tile")
@@ -724,16 +741,28 @@
 
         var projectName = document.createElement("div")
         projectName.textContent = name
+        .replace("&amp;","&")
+        .replace("&gt;",">")
+        .replace("&lt;","<")
+        .replace("&#39;","'")
+        .replace('&#34;','"')
+
         projectName.classList.add("project__name")
         projectTile.appendChild(projectName)
 
         var projectUsers = document.createElement("div")
-        projectUsers.textContent = users + " users online"
+        if (users == 1) {
+            projectUsers.textContent = users + " user online"
+        }
+        else {
+            projectUsers.textContent = users + " users online"
+        }
+
         projectUsers.classList.add("project__users")
         projectTile.appendChild(projectUsers)
 
         var projectModified = document.createElement("div")
-        projectModified.textContent = "29.01.20"
+        projectModified.textContent = date
         projectModified.classList.add("project__modified")
         projectTile.appendChild(projectModified)
         
@@ -762,14 +791,17 @@
                 "code" : code
             })
 
-
-
             for (let i = 0; i < projectJSON.length; i++) {
                 if (projectJSON[i].code == code) {
                     projectJSON.splice(i,1)
                     break;
                 }
             }
+
+            if (projectJSON.length < 1) {
+                ShowNoProjectsMessage()
+            }
+
         })
         projectTile.appendChild(projectRemove)
 
@@ -797,34 +829,40 @@
     var HTMLparser = new DOMParser().parseFromString("{{ projects }}", "text/html")
 
     projectJSON.forEach(function(project){
-        CreateProjectTile(project.name, project.code, project.users)
+        CreateProjectTile(project.name, project.code, project.users, project.date)
     })
 
     var projectSearchInput = document.getElementById("project-search-input")
     projectSearchInput.addEventListener("keyup",function(e){
-        
 
-        RemoveSearchMessage()
-
-        let searchSuccess = false
-
-
-        for (var i = 0; i < projectJSON.length; i++) {
-            
-            let lowerProjectName = projectJSON[i].name.toLowerCase()
-            let lowerSearchText = e.target.value.toLowerCase()
-     
-            if (lowerProjectName.includes(lowerSearchText)) {
-                searchSuccess = true
-                projectTileElements[(projectTileElements.length - 1) - i].classList.remove("hide")
-            }
-            else {
-                projectTileElements[(projectTileElements.length - 1) - i].classList.add("hide")
-            }
+        if (projectJSON.length < 1) {
+            ShowNoProjectsMessage()
         }
+        else {
 
-        if (!searchSuccess) {
-            ShowSearchMessage()
+            RemoveSearchMessage()
+
+            let searchSuccess = false
+
+
+            for (var i = 0; i < projectJSON.length; i++) {
+                
+                let lowerProjectName = projectJSON[i].name.toLowerCase()
+                let lowerSearchText = e.target.value.toLowerCase()
+        
+                if (lowerProjectName.includes(lowerSearchText)) {
+                    searchSuccess = true
+                    projectTileElements[(projectTileElements.length - 1) - i].classList.remove("hide")
+                }
+                else {
+                    projectTileElements[(projectTileElements.length - 1) - i].classList.add("hide")
+                }
+            }
+
+            if (!searchSuccess) {
+                ShowSearchMessage()
+            }
+
         }
     })
 
@@ -908,6 +946,11 @@
     })
 
 
+    
+    if (projectJSON.length < 1) {
+        ShowNoProjectsMessage()
+    }
+
 
       
 
@@ -954,7 +997,7 @@
         
         setTimeout(function(){
 
-            CreateProjectTile(msg.name,msg.code,msg.users)
+            CreateProjectTile(msg.name,msg.code,msg.users,msg.date)
             
             ProgressBarHide()
     

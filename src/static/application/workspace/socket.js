@@ -24,12 +24,13 @@ var incorrectSyntaxMessage = document.getElementById("incorrect-syntax-message")
 var wrapperTimer;
 var wrapperTimerActive = false
 
-function Message(type,message=false,time=0,releaseAfter=false) {
+function Message(type,message=false,time=0,releaseAfter=false,refreshAfter=false) {
 
     if (type == "release") {
         blocklyWrapper.classList.add("hide")
     }
     else if (type == "show") {
+
         blocklyWrapper.classList.remove("hide")
         blocklyWrapper.classList.remove("transparent")
         workspaceLoadingMessage.style.display = "none"
@@ -75,6 +76,10 @@ function Message(type,message=false,time=0,releaseAfter=false) {
             },time)
             wrapperTimerActive = true
         
+        }
+
+        if (refreshAfter) {
+            location.reload()
         }
     }
     else if (type == "block") {
@@ -134,7 +139,7 @@ editButton.addEventListener("click", function(){
 socket.on("edit_request", function(msg){
 
     if (msg.edit) {
-        Message("show",positiveEditMessage,2000,true)
+        Message("show",positiveEditMessage,2000,true,true) //ReloadAfter
         deleteBlockly(workspace)
         workspace = createBlockly({toolbox: document.getElementById('toolbox'), sounds: false})
         isCurrentEditor = true
@@ -151,30 +156,38 @@ socket.on("edit_request", function(msg){
 })
 
 socket.on("edit_takeover", function(){
-    Message("show",allowEditMessage,4000,true)
+    Message("show",allowEditMessage,5000,true)
 })
 
 allowEditButton.addEventListener("click",function(){
-
     deleteBlockly(workspace)
     workspace = createBlockly("create",{readOnly: true, sounds: false})
-    Message("block")
+    Message("block") //Refresh After
     isCurrentEditor = false
     socket.emit("edit_takeover", {
-        "promote" : true
+        "promote" : true,
+        "code" : code
     })
+
+    setTimeout(function(){
+        location.reload()
+    },500)
+
 })
 
 blockEditButton.addEventListener("click", function(){
     socket.emit("edit_takeover", {
-        "promote" : false
+        "promote" : false,
+        "code" : code
     })
+
+    Message("release")
 })
 
 socket.on("edit_takeover_reply", function(msg){
 
     if (msg.edit) {
-        Message("show",positiveEditMessage,2000,true)
+        Message("show",positiveEditMessage,2000,true,true)
         deleteBlockly(workspace)
         workspace = createBlockly({toolbox: document.getElementById('toolbox'), sounds: false})
         isCurrentEditor = true
@@ -184,8 +197,6 @@ socket.on("edit_takeover_reply", function(msg){
         isCurrentEditor = false
     }
 })
-
-
 
 socket.on("project_update_workspace", function(msg){
     var blocklyEvent = Blockly.Events.fromJson(msg.blocklyEvent, workspace)
@@ -204,3 +215,33 @@ ProjectMappingJSON = []
 socket.on("get_mappings", function(msg) {
     ProjectMappingJSON = msg.mappings
 })
+
+socket.on("edit_force_takeover", function(){
+
+    setTimeout(function(){
+        location.reload()
+    },1500)
+
+    deleteBlockly(workspace)
+    workspace = createBlockly("create",{readOnly: true, sounds: false})
+    Message("block")
+    isCurrentEditor = false
+
+})
+
+function GetTimestamp(display=true) {
+    var currentDate = new Date();
+    var currentSeconds = currentDate.getSeconds();
+    var currentMinute = currentDate.getMinutes();
+    var currentHour = currentDate.getHours();
+    var currentMonth =currentDate.getMonth();
+    var currentDayofMonth = currentDate.getDate();
+    var currentYear = currentDate.getFullYear();
+
+    if (display) {
+        return currentDayofMonth + "." + (currentMonth + 1) + "." + currentYear + " " + currentHour + ":" + currentMinute + ":" + currentSeconds;
+    }
+    else {
+        return currentDayofMonth + "." + (currentMonth + 1) + "." + currentYear + " at " + currentHour + "." + currentMinute + "." + currentSeconds;
+    }
+}

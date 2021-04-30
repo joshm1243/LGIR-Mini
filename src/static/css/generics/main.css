@@ -80,6 +80,7 @@ body {
     padding: 15px;
     display: block;
     cursor: pointer;
+    user-select: none;
 }
 
 #top_nav .sep {
@@ -147,10 +148,14 @@ input:focus{
     outline: none;
 }
 
-
 .project-specific {
     background-color: #3b3b3b;
 }
+
+.ignore-link:hover {
+    background-color: #555555;
+}
+
 
 
 .active-link {
